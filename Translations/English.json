@@ -21,6 +21,5 @@
   "bettercamera_photo_hint_fast": "Faster",
   "bettercamera_photo_hint_updown": "Up / down",
   "bettercamera_photo_hint_move": "Move",
-  "bettercamera_photo_speed": "Speed: $1 m/s",
-  "bettercamera_photo_hint_inventory": "Change gear"
+  "bettercamera_photo_speed": "Speed: $1 m/s"
 }

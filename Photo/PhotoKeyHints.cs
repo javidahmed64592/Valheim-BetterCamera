@@ -57,7 +57,6 @@ internal static class PhotoKeyHints
         new Hint { Keys = [ToggleKey], Label = () => "$bettercamera_photo_hint_exit" },
         new Hint { Keys = ["F11"], Label = () => "$bettercamera_photo_hint_screenshot" },
         new Hint { Keys = [HideUiKey], Label = () => "$bettercamera_photo_hint_hud" },
-        new Hint { Keys = ["$KEY_Inventory"], Label = () => "$bettercamera_photo_hint_inventory" },
         new Hint { Keys = [ResetKey], Label = () => "$bettercamera_photo_hint_reset" },
         new Hint { Keys = [RollLeftKey, RollRightKey], Separator = "/", Label = () => "$bettercamera_photo_hint_roll" },
         new Hint { Keys = ["Left Alt", ScrollIcon], Label = () => "$bettercamera_photo_hint_speed" },
@@ -85,7 +84,7 @@ internal static class PhotoKeyHints
     private static readonly string[] AllLabels =
     [
         "$bettercamera_photo_hint_exit", "$bettercamera_photo_hint_screenshot", "$bettercamera_photo_hint_hud",
-        "$bettercamera_photo_hint_reset", "$bettercamera_photo_hint_inventory", "$bettercamera_photo_hint_roll", "$bettercamera_photo_hint_speed",
+        "$bettercamera_photo_hint_reset", "$bettercamera_photo_hint_roll", "$bettercamera_photo_hint_speed",
         "$bettercamera_photo_hint_zoom", "$bettercamera_photo_hint_follow", "$bettercamera_photo_hint_unfollow",
         "$bettercamera_photo_hint_look", "$bettercamera_photo_hint_unlook", "$bettercamera_photo_hint_fast",
         "$bettercamera_photo_hint_updown", "$bettercamera_photo_hint_move",
