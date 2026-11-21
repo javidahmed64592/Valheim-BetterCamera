@@ -19,14 +19,4 @@ internal enum ViewAnchor
     /// The middle of the ship or mount, raised a little.
     /// </summary>
     Centre = 1,
-
-    /// <summary>
-    /// High above the ship or mount, to see over waves, walls and terrain.
-    /// </summary>
-    Overview = 2,
-
-    /// <summary>
-    /// The ship's bow or the mount's head, to see ahead.
-    /// </summary>
-    Front = 3,
 }

@@ -16,8 +16,8 @@ namespace BetterCamera.Camera;
 /// remembers its own zoom level, which comes back when returning to that mode.</item>
 /// <item>Zooming in past the minimum enters first person at the eyes (vanilla's own first person offset), with the
 /// body hidden; zooming out of it returns to the minimum.</item>
-/// <item>While sailing or riding, the cycle key moves what the camera orbits: the player (vanilla), the vehicle's
-/// centre, a high overview, or its front. Switching blends over a short time.</item>
+/// <item>While sailing or riding, the cycle key switches what the camera orbits between the player (vanilla) and
+/// the vehicle's centre. Switching blends over a short time.</item>
 /// </list>
 /// </summary>
 internal static class CameraController
@@ -34,9 +34,7 @@ internal static class CameraController
     private static ConfigEntry<bool> _firstPerson;
     private static ConfigEntry<KeyCode> _cycleKey;
     private static ConfigEntry<float> _shipLift;
-    private static ConfigEntry<float> _shipOverview;
     private static ConfigEntry<float> _mountLift;
-    private static ConfigEntry<float> _mountOverview;
     private static ConfigEntry<float> _transitionTime;
 
     private static readonly Dictionary<TravelMode, float> Distances = [];
@@ -62,20 +60,16 @@ internal static class CameraController
             "Zooming out again returns to third person.");
 
         _cycleKey = config.Bind("Keybinds", "Cycle View", KeyCode.C,
-            "While steering a ship or riding, switches what the camera orbits: you, the vehicle's centre, a high " +
-            "overview, or its front. While doing either, this key no longer toggles walking. " +
+            "While steering a ship or riding, switches the camera between following you and following the ship's " +
+            "or mount's centre. While doing either, this key no longer toggles walking. " +
             "Rebindable from the in-game controls menu.");
         InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = ButtonName, Config = _cycleKey });
 
         const string views = "Views";
-        _shipLift = config.Bind(views, "Ship Height", 2.5f,
-            new ConfigDescription("Metres above the waterline of the ship's centre and bow views.", new AcceptableValueRange<float>(0f, 10f)));
-        _shipOverview = config.Bind(views, "Ship Overview Height", 12f,
-            new ConfigDescription("Metres above the waterline of the ship's overview.", new AcceptableValueRange<float>(2f, 40f)));
+        _shipLift = config.Bind(views, "Ship Height", 4.5f,
+            new ConfigDescription("Metres above the waterline of the ship's centre view.", new AcceptableValueRange<float>(0f, 20f)));
         _mountLift = config.Bind(views, "Mount Height", 0.5f,
-            new ConfigDescription("Metres above the top of the mount of its centre and front views.", new AcceptableValueRange<float>(0f, 5f)));
-        _mountOverview = config.Bind(views, "Mount Overview Height", 5f,
-            new ConfigDescription("Metres above the top of the mount of its overview.", new AcceptableValueRange<float>(1f, 20f)));
+            new ConfigDescription("Metres above the top of the mount of its centre view.", new AcceptableValueRange<float>(0f, 10f)));
         _transitionTime = config.Bind(views, "Transition Time", 0.4f,
             new ConfigDescription("Seconds the camera takes to move to a new view.", new AcceptableValueRange<float>(0f, 2f)));
     }
@@ -158,7 +152,7 @@ internal static class CameraController
 
         TravelMode mode = ModeOf(player);
         ViewAnchor current = Anchors.TryGetValue(mode, out ViewAnchor anchor) ? anchor : ViewAnchor.Player;
-        ViewAnchor next = (ViewAnchor)(((int)current + 1) % 4);
+        ViewAnchor next = current == ViewAnchor.Player ? ViewAnchor.Centre : ViewAnchor.Player;
         _fromAnchor = current;
         _anchorChangedAt = Time.time;
         Anchors[mode] = next;
@@ -168,14 +162,8 @@ internal static class CameraController
 
     private static string AnchorToken(TravelMode mode, ViewAnchor anchor)
     {
-        bool ship = mode == TravelMode.Sailing;
-        return anchor switch
-        {
-            ViewAnchor.Centre => ship ? "$bettercamera_view_ship_centre" : "$bettercamera_view_mount_centre",
-            ViewAnchor.Overview => "$bettercamera_view_overview",
-            ViewAnchor.Front => ship ? "$bettercamera_view_bow" : "$bettercamera_view_front",
-            _ => "$bettercamera_view_player",
-        };
+        string centre = mode == TravelMode.Sailing ? "$bettercamera_view_ship_centre" : "$bettercamera_view_mount_centre";
+        return anchor == ViewAnchor.Centre ? centre : "$bettercamera_view_player";
     }
 
     private static bool Blocked()
@@ -298,47 +286,29 @@ internal static class CameraController
         Ship ship = player.GetControlledShip();
         if (ship != null && ship.m_floatCollider != null)
         {
-            return ShipPivot(ship, anchor);
+            return ShipPivot(ship);
         }
 
         Character mount = (player.m_doodadController as Sadle)?.GetCharacter();
-        return mount != null && mount.GetCollider() != null ? MountPivot(mount, anchor) : playerPivot;
+        return mount != null && mount.GetCollider() != null ? MountPivot(mount) : playerPivot;
     }
 
     /// <summary>
-    /// The ship's float collider marks its hull at the waterline: its centre, and its front edge for the bow.
-    /// Heights are in world up, so the views don't rock with the waves.
+    /// The ship's float collider marks its hull at the waterline. The height is in world up, so the view doesn't
+    /// rock with the waves.
     /// </summary>
-    private static Vector3 ShipPivot(Ship ship, ViewAnchor anchor)
+    private static Vector3 ShipPivot(Ship ship)
     {
         BoxCollider hull = ship.m_floatCollider;
-        Vector3 centre = hull.transform.TransformPoint(hull.center);
-        Vector3 forward = ship.transform.forward;
-        forward.y = 0f;
-        forward.Normalize();
-        float halfLength = hull.transform.TransformVector(new Vector3(0f, 0f, hull.size.z / 2f)).magnitude;
-
-        return anchor switch
-        {
-            ViewAnchor.Overview => centre + (Vector3.up * _shipOverview.Value),
-            ViewAnchor.Front => centre + (forward * halfLength * 0.9f) + (Vector3.up * _shipLift.Value),
-            _ => centre + (Vector3.up * _shipLift.Value),
-        };
+        return hull.transform.TransformPoint(hull.center) + (Vector3.up * _shipLift.Value);
     }
 
     /// <summary>
-    /// The mount's collider gives its middle and top; its head point is the front.
+    /// Above the middle of the top of the mount's collider.
     /// </summary>
-    private static Vector3 MountPivot(Character mount, ViewAnchor anchor)
+    private static Vector3 MountPivot(Character mount)
     {
         Bounds bounds = mount.GetCollider().bounds;
-        Vector3 top = new(bounds.center.x, bounds.max.y, bounds.center.z);
-
-        return anchor switch
-        {
-            ViewAnchor.Overview => top + (Vector3.up * _mountOverview.Value),
-            ViewAnchor.Front => mount.GetHeadPoint() + (Vector3.up * _mountLift.Value),
-            _ => top + (Vector3.up * _mountLift.Value),
-        };
+        return new Vector3(bounds.center.x, bounds.max.y, bounds.center.z) + (Vector3.up * _mountLift.Value);
     }
 }

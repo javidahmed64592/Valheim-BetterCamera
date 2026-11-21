@@ -1,6 +1,6 @@
 {
   "name": "BetterCamera",
-  "description": "Zoom further out or into first person, with zoom limits for walking, sailing and riding, and switch the camera to the ship or mount's centre, an overview or its front.",
+  "description": "Zoom further out or into first person, with zoom limits for walking, sailing and riding, and switch the camera to follow the centre of your ship or mount.",
   "version_number": "0.1.0",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2360",

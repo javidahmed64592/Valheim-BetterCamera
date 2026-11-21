@@ -20,10 +20,13 @@ internal static class ZInput_Update_Patch
         AccessTools.FieldRefAccess<ZInput, Dictionary<string, ZInput.ButtonDef>>("m_buttons");
 
     [HarmonyPostfix]
-    private static void Postfix(ZInput __instance)
+    private static void Postfix()
     {
-        if (CameraController.Travelling(Player.m_localPlayer)
-            && Buttons(__instance).TryGetValue(ToggleWalk, out ZInput.ButtonDef button)
+        // ZInput.Update is static, so the buttons come from the instance.
+        ZInput input = ZInput.instance;
+        if (input != null
+            && CameraController.Travelling(Player.m_localPlayer)
+            && Buttons(input).TryGetValue(ToggleWalk, out ZInput.ButtonDef button)
             && button.Pressed)
         {
             button.ResetState();
