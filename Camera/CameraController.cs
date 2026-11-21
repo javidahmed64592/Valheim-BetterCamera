@@ -16,8 +16,8 @@ namespace BetterCamera.Camera;
 /// remembers its own zoom level, which comes back when returning to that mode.</item>
 /// <item>Zooming in past the minimum enters first person at the eyes (vanilla's own first person offset), with the
 /// body hidden; zooming out of it returns to the minimum.</item>
-/// <item>While sailing or riding, the cycle key switches what the camera orbits between the player (vanilla) and
-/// the vehicle's centre. Switching blends over a short time.</item>
+/// <item>While steering a ship, the cycle key switches what the camera orbits between the player (vanilla) and the
+/// ship's centre. Switching blends over a short time.</item>
 /// </list>
 /// </summary>
 internal static class CameraController
@@ -34,7 +34,6 @@ internal static class CameraController
     private static ConfigEntry<bool> _firstPerson;
     private static ConfigEntry<KeyCode> _cycleKey;
     private static ConfigEntry<float> _shipLift;
-    private static ConfigEntry<float> _mountLift;
     private static ConfigEntry<float> _transitionTime;
 
     private static readonly Dictionary<TravelMode, float> Distances = [];
@@ -72,16 +71,14 @@ internal static class CameraController
             "Zooming out again returns to third person.");
 
         _cycleKey = config.Bind("Keybinds", "Cycle View", KeyCode.C,
-            "While steering a ship or riding, switches the camera between following you and following the ship's " +
-            "or mount's centre. While doing either, this key no longer toggles walking. " +
+            "While steering a ship, switches the camera between following you and following the ship's centre. " +
+            "While steering, this key no longer toggles walking. " +
             "Rebindable from the in-game controls menu.");
         InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = ButtonName, Config = _cycleKey });
 
         const string views = "Views";
         _shipLift = config.Bind(views, "Ship Height", 4.5f,
             new ConfigDescription("Metres above the waterline of the ship's centre view.", new AcceptableValueRange<float>(0f, 20f)));
-        _mountLift = config.Bind(views, "Mount Height", 0.5f,
-            new ConfigDescription("Metres above the top of the mount of its centre view.", new AcceptableValueRange<float>(0f, 10f)));
         _transitionTime = config.Bind(views, "Transition Time", 0.4f,
             new ConfigDescription("Seconds the camera takes to move to a new view.", new AcceptableValueRange<float>(0f, 2f)));
     }
@@ -121,11 +118,11 @@ internal static class CameraController
     }
 
     /// <summary>
-    /// True while the local player steers a ship or rides, when the cycle key is theirs and C doesn't toggle walking.
+    /// True while the local player steers a ship, when the cycle key is theirs and C doesn't toggle walking.
     /// </summary>
-    internal static bool Travelling(Player player)
+    internal static bool Steering(Player player)
     {
-        return player != null && ModeOf(player) != TravelMode.Walking;
+        return player != null && ModeOf(player) == TravelMode.Sailing;
     }
 
     /// <summary>
@@ -159,7 +156,7 @@ internal static class CameraController
     /// </summary>
     public static void UpdateInput(Player player)
     {
-        if (!Travelling(player) || Blocked() || !ZInput.GetButtonDown(ButtonQueryName))
+        if (!Steering(player) || Blocked() || !ZInput.GetButtonDown(ButtonQueryName))
         {
             return;
         }
@@ -171,13 +168,12 @@ internal static class CameraController
         _anchorChangedAt = Time.time;
         Anchors[mode] = next;
         player.Message(MessageHud.MessageType.TopLeft,
-            Localization.instance.Localize("$bettercamera_view", Localization.instance.Localize(AnchorToken(mode, next))));
+            Localization.instance.Localize("$bettercamera_view", Localization.instance.Localize(AnchorToken(next))));
     }
 
-    private static string AnchorToken(TravelMode mode, ViewAnchor anchor)
+    private static string AnchorToken(ViewAnchor anchor)
     {
-        string centre = mode == TravelMode.Sailing ? "$bettercamera_view_ship_centre" : "$bettercamera_view_mount_centre";
-        return anchor == ViewAnchor.Centre ? centre : "$bettercamera_view_player";
+        return anchor == ViewAnchor.Centre ? "$bettercamera_view_ship_centre" : "$bettercamera_view_player";
     }
 
     private static bool Blocked()
@@ -217,7 +213,7 @@ internal static class CameraController
             _anchorChangedAt = -100f;
         }
 
-        // First person only around the player: inside a ship or a mount there's nothing to see.
+        // First person only around the player: inside a ship there's nothing to see.
         ViewAnchor anchor = Anchor;
         bool firstPersonAllowed = _firstPerson.Value && anchor == ViewAnchor.Player;
         if (modeChanged || anchor != _lastAnchor)
@@ -324,13 +320,7 @@ internal static class CameraController
         }
 
         Ship ship = player.GetControlledShip();
-        if (ship != null && ship.m_floatCollider != null)
-        {
-            return ShipPivot(ship);
-        }
-
-        Character mount = (player.m_doodadController as Sadle)?.GetCharacter();
-        return mount != null && mount.GetCollider() != null ? MountPivot(mount) : playerPivot;
+        return ship != null && ship.m_floatCollider != null ? ShipPivot(ship) : playerPivot;
     }
 
     /// <summary>
@@ -343,14 +333,4 @@ internal static class CameraController
         return hull.transform.TransformPoint(hull.center) + (Vector3.up * _shipLift.Value);
     }
 
-    /// <summary>
-    /// Above the mount's own position, at the height of the top of its collider. The collider isn't always
-    /// centred on the body (the lox's sits off to one side), so it only gives the height.
-    /// </summary>
-    private static Vector3 MountPivot(Character mount)
-    {
-        Vector3 position = mount.transform.position;
-        float top = mount.GetCollider().bounds.max.y;
-        return new Vector3(position.x, top + _mountLift.Value, position.z);
-    }
 }

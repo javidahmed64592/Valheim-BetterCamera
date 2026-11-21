@@ -4,11 +4,11 @@
 
 # BetterCamera
 
-Zoom further out or into first person, with zoom limits for walking, sailing and riding, and switch the camera to follow the centre of your ship or mount.
+Zoom further out or into first person, with zoom limits for walking, sailing and riding, and switch the camera to follow the centre of your ship.
 
 - **Zoom further**: Zoom out up to 16 m while walking, 40 m while steering a ship and 24 m while riding.
 - **First person**: Zoom all the way in to look around through your character's eyes.
-- **Travel views**: While steering a ship or riding, switch the camera by pressing `C` to follow the ship's or mount's centre, so you can look all around it.
+- **Ship view**: While steering a ship, press `C` to switch the camera to follow the ship's centre, so you can look all around it.
 
 ## Camera Views
 
