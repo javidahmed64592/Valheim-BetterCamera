@@ -29,6 +29,7 @@ internal static class FirstPersonSettings
     private static ConfigEntry<float> _turnAngle;
     private static ConfigEntry<Vector3> _cameraOffset;
     private static ConfigEntry<Vector3> _bowAimOffset;
+    private static ConfigEntry<float> _maxLookDown;
 
     /// <summary>
     /// The camera's near clip plane in first person, close enough for the hands and gear (vanilla 0.1 to 0.5 m).
@@ -45,6 +46,11 @@ internal static class FirstPersonSettings
     public static Vector3 CameraOffset => _cameraOffset.Value;
 
     public static Vector3 BowAimOffset => _bowAimOffset.Value;
+
+    /// <summary>
+    /// The furthest you can look down in first person, in degrees below level.
+    /// </summary>
+    public static float MaxLookDown => _maxLookDown.Value;
 
     public static void BindConfig(ConfigFile config)
     {
@@ -63,6 +69,10 @@ internal static class FirstPersonSettings
         _bowAimOffset = config.Bind(section, "Bow Aim Offset", new Vector3(0.15f, 0.03f, 0f),
             "Extra camera offset while drawing a bow, in metres right, up and forward, so the bow (held in front " +
             "of your face) sits beside the crosshair instead of covering it. Arrows still fly to the crosshair.");
+        _maxLookDown = config.Bind(section, "Max Look Down", 65f,
+            new ConfigDescription("The furthest you can look down in first person, in degrees below level, so the " +
+                "camera doesn't see inside your armour and body (vanilla 89).",
+                new AcceptableValueRange<float>(30f, 89f)));
     }
 
     /// <summary>

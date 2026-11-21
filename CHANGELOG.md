@@ -8,6 +8,7 @@
   - Your body turns with your head once you look more than 60° to the side (`Body Turn Angle`), and always faces where you look while moving.
   - The camera moves with your head as the animations lean and bob, and your head faces where you look, so lights worn on it (like the Dvergr circlet's) shine at the crosshair.
   - Your hands and gear are no longer cut off close to the camera, and while drawing a bow the view shifts slightly so the bow doesn't cover the crosshair (`Bow Aim Offset`).
+  - Looking down stops at 65° (`Max Look Down`), so the camera doesn't see inside your armour.
 
 ## 0.1.0
 
