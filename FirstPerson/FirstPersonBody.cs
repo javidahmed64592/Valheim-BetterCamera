@@ -14,8 +14,7 @@ namespace BetterCamera.FirstPerson;
 /// <item>Held item view: the whole body (and whatever is worn or held) is hidden from the camera, keeping its
 /// shadow. Equipment can change meanwhile, so new renderers are picked up every frame.</item>
 /// </list>
-/// In both views the head turns to face where you look, so anything worn on it (such as the Dvergr circlet's
-/// light) points at the crosshair. Everything is put back as it was when leaving first person or switching view.
+/// In both views, lights worn on the head (such as the Dvergr circlet's) point where you look. Everything is put back as it was when leaving first person or switching view.
 /// </summary>
 internal static class FirstPersonBody
 {
@@ -28,13 +27,10 @@ internal static class FirstPersonBody
     private static Vector3 _headScale;
 
     /// <summary>
-    /// The head as the animation last posed it, the rotation written over it, and how the head sat relative to
-    /// the body when first person started.
+    /// Lights on the helmet slot that are being aimed, with their own rotation to put back.
     /// </summary>
-    private static Transform _turnedHead;
-    private static Quaternion _animatedRotation;
-    private static Quaternion _writtenRotation;
-    private static Quaternion _headToBody;
+    private static readonly Dictionary<Light, Quaternion> AimedLights = [];
+    private static readonly List<Light> Lights = [];
 
     public static void Update(Player player, bool firstPerson)
     {
@@ -44,7 +40,7 @@ internal static class FirstPersonBody
             return;
         }
 
-        TurnHead(player);
+        AimHeadLights(player);
 
         if (FirstPersonSettings.Gear == GearView.Body)
         {
@@ -59,52 +55,50 @@ internal static class FirstPersonBody
     }
 
     /// <summary>
-    /// Points the head exactly where the player looks. Adding the look on top of the animation overshot, as some
-    /// animations already lean the upper body towards the view; the head is hidden, so its animation isn't
-    /// needed. How the head sits relative to the body when first person starts gives its forward direction.
+    /// Points every light on the helmet slot (such as the Dvergr circlet's) along the camera's view, so it shines
+    /// where the crosshair is. The head bone itself isn't turned: it's hidden, and its resting angle depends on
+    /// the animation, so a light carried by it would point somewhere else depending on when first person started.
     /// </summary>
-    private static void TurnHead(Player player)
+    private static void AimHeadLights(Player player)
     {
-        Transform head = player.m_head;
-        if (head == null || player.m_eye == null)
+        GameObject helmet = player.m_visEquipment != null ? player.m_visEquipment.m_helmetItemInstance : null;
+        UnityEngine.Camera camera = Utils.GetMainCamera();
+        if (helmet == null || camera == null)
         {
+            RestoreLights();
             return;
         }
 
-        if (head != _turnedHead)
+        helmet.GetComponentsInChildren(includeInactive: false, Lights);
+        foreach (Light light in Lights)
         {
-            _turnedHead = head;
-            _headToBody = Quaternion.Inverse(player.transform.rotation) * head.rotation;
-        }
+            if (!AimedLights.ContainsKey(light))
+            {
+                AimedLights[light] = light.transform.localRotation;
+            }
 
-        // Remember the animation's pose, to put back when leaving first person.
-        if (head.localRotation != _writtenRotation)
-        {
-            _animatedRotation = head.localRotation;
+            light.transform.rotation = camera.transform.rotation;
         }
-
-        head.rotation = player.m_eye.rotation * _headToBody;
-        _writtenRotation = head.localRotation;
     }
 
-    /// <summary>
-    /// Puts the head back to its animated pose if the animation hasn't already.
-    /// </summary>
-    private static void RestoreHeadTurn()
+    private static void RestoreLights()
     {
-        if (_turnedHead != null && _turnedHead.localRotation == _writtenRotation)
+        foreach (KeyValuePair<Light, Quaternion> entry in AimedLights)
         {
-            _turnedHead.localRotation = _animatedRotation;
+            if (entry.Key != null)
+            {
+                entry.Key.transform.localRotation = entry.Value;
+            }
         }
 
-        _turnedHead = null;
+        AimedLights.Clear();
     }
 
     public static void Restore()
     {
         ShowRenderers();
         RestoreHead();
-        RestoreHeadTurn();
+        RestoreLights();
     }
 
     private static void ShrinkHead(Transform head)
