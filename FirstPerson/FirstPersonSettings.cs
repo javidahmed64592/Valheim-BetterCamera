@@ -15,6 +15,7 @@ internal static class FirstPersonSettings
     private static ConfigEntry<float> _maxLookDown;
     private static ConfigEntry<float> _seatedTurnAngle;
     private static ConfigEntry<float> _seatedMaxLookDown;
+    private static ConfigEntry<float> _seatedMaxLookDownSideways;
 
     /// <summary>
     /// The camera's near clip plane in first person, close enough for the hands and gear (vanilla 0.1 to 0.5 m).
@@ -45,6 +46,11 @@ internal static class FirstPersonSettings
     /// </summary>
     public static float SeatedMaxLookDown => _seatedMaxLookDown.Value;
 
+    /// <summary>
+    /// While seated and looking well to the side, the furthest you can look down, in degrees below level.
+    /// </summary>
+    public static float SeatedMaxLookDownSideways => _seatedMaxLookDownSideways.Value;
+
     public static void BindConfig(ConfigFile config)
     {
         const string section = "First Person";
@@ -62,13 +68,19 @@ internal static class FirstPersonSettings
             new ConfigDescription("The furthest you can look down in first person, in degrees below level, so the " +
                 "camera doesn't see inside your armour and body (vanilla 89).",
                 new AcceptableValueRange<float>(30f, 89f)));
-        _seatedTurnAngle = config.Bind(section, "Seated Turn Angle", 110f,
+        _seatedTurnAngle = config.Bind(section, "Seated Turn Angle", 135f,
             new ConfigDescription("While seated (at the helm, on a chair or riding), how far you can look to either " +
                 "side, in degrees, so you can look over your shoulders without seeing inside your body.",
                 new AcceptableValueRange<float>(30f, 180f)));
         _seatedMaxLookDown = config.Bind(section, "Seated Max Look Down", 60f,
-            new ConfigDescription("While seated, the furthest you can look down, in degrees below level.",
-                new AcceptableValueRange<float>(30f, 89f)));
+            new ConfigDescription("While seated and facing forward, the furthest you can look down, in degrees " +
+                "below level.",
+                new AcceptableValueRange<float>(0f, 89f)));
+        _seatedMaxLookDownSideways = config.Bind(section, "Seated Max Look Down Sideways", 15f,
+            new ConfigDescription("While seated and looking well to the side, the furthest you can look down, in " +
+                "degrees below level. Turning while looking down lifts the view towards this, so the camera doesn't " +
+                "see inside your body.",
+                new AcceptableValueRange<float>(-30f, 89f)));
     }
 
     /// <summary>
