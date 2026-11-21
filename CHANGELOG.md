@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- First person is now made for playing, not just looking around:
+  - Your body stays visible apart from the head, so you see your arms and gear with the game's own animations. Set `Gear View` to `HeldItem` to hide the body instead.
+  - Bows, spears, staffs and other ranged attacks fly to where the crosshair points.
+  - Your body turns with your head once you look more than 60° to the side (`Body Turn Angle`), and always faces where you look while moving.
+
 ## 0.1.0
 
 - First release.

@@ -2,6 +2,8 @@ using System.Collections.Generic;
 
 using BepInEx.Configuration;
 
+using BetterCamera.FirstPerson;
+
 using Jotunn.Configs;
 using Jotunn.Managers;
 
@@ -228,6 +230,7 @@ internal static class CameraController
             _lastAnchor = anchor;
         }
 
+        camera.m_fpsOffset = FirstPersonSettings.CameraOffset;
         camera.m_minDistance = firstPersonAllowed ? 0f : Min(mode);
         camera.m_maxDistance = Max(mode);
         camera.m_maxDistanceBoat = Max(mode);
