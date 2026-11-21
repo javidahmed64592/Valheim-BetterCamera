@@ -26,15 +26,9 @@ Zoom in past the closest third-person distance to switch to first person, and zo
 
 ![Sailing First Person](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/sailing_first_person.png)
 
-## Ship View
-
-While steering a ship, press `Shift+C` to switch the camera between following you and following the centre of the ship, so you can look all around it.
-
-![Sailing Zoomed Out](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/sailing_zoomed_out.png)
-
 ## Photo Mode
 
-Press `J` to fly a free camera around your character (up to 100 m away) and line up a shot. Your character stands still while the world keeps going, and photo mode ends if you take damage. The hotbar, map and health are hidden, and every control is shown at the bottom right.
+Press `J` to fly a free camera around your character (up to 100 m away) and line up a shot.
 
 | Key            | Action                                                     |
 | -------------- | ---------------------------------------------------------- |
@@ -51,6 +45,14 @@ Press `J` to fly a free camera around your character (up to 100 m away) and line
 | `U`            | Hide or show the rest of the UI.                           |
 | `F11`          | Take a screenshot (vanilla, saved in Valheim's `screenshots` folder). |
 | `J`            | Leave photo mode.                                          |
+
+![Photo Mode](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/photo_mode.png)
+
+## Ship View
+
+While steering a ship, press `Shift+C` to switch the camera between following you and following the centre of the ship, so you can look all around it.
+
+![Sailing Zoomed Out](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/sailing_zoomed_out.png)
 
 ## Configuration
 
