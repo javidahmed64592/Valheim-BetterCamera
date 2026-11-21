@@ -28,6 +28,12 @@ internal static class FirstPersonSettings
     private static ConfigEntry<GearView> _gearView;
     private static ConfigEntry<float> _turnAngle;
     private static ConfigEntry<Vector3> _cameraOffset;
+    private static ConfigEntry<Vector3> _bowAimOffset;
+
+    /// <summary>
+    /// The camera's near clip plane in first person, close enough for the hands and gear (vanilla 0.1 to 0.5 m).
+    /// </summary>
+    public const float NearClip = 0.05f;
 
     public static GearView Gear => _gearView.Value;
 
@@ -37,6 +43,8 @@ internal static class FirstPersonSettings
     public static float TurnAngle => _turnAngle.Value;
 
     public static Vector3 CameraOffset => _cameraOffset.Value;
+
+    public static Vector3 BowAimOffset => _bowAimOffset.Value;
 
     public static void BindConfig(ConfigFile config)
     {
@@ -52,6 +60,9 @@ internal static class FirstPersonSettings
         _cameraOffset = config.Bind(section, "Camera Offset", new Vector3(0f, 0.1f, 0.12f),
             "Where the first-person camera sits relative to your head's pivot (the top of the neck), in metres " +
             "right, up and forward along where you look. The camera follows the head as the animations move it.");
+        _bowAimOffset = config.Bind(section, "Bow Aim Offset", new Vector3(0.15f, 0.03f, 0f),
+            "Extra camera offset while drawing a bow, in metres right, up and forward, so the bow (held in front " +
+            "of your face) sits beside the crosshair instead of covering it. Arrows still fly to the crosshair.");
     }
 
     /// <summary>

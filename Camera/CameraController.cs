@@ -326,8 +326,17 @@ internal static class CameraController
     /// </summary>
     private static Vector3 FirstPersonPivot(Player player)
     {
-        return player.m_head.position + (player.m_eye.rotation * FirstPersonSettings.CameraOffset);
+        // Ease the bow offset in and out over about 0.15 s.
+        float target = player.IsDrawingBow() ? 1f : 0f;
+        _bowAim = Mathf.MoveTowards(_bowAim, target, Time.deltaTime / 0.15f);
+        Vector3 offset = FirstPersonSettings.CameraOffset + (FirstPersonSettings.BowAimOffset * Mathf.SmoothStep(0f, 1f, _bowAim));
+        return player.m_head.position + (player.m_eye.rotation * offset);
     }
+
+    /// <summary>
+    /// How far the camera has moved to the bow aiming position, 0 to 1.
+    /// </summary>
+    private static float _bowAim;
 
     private static Vector3 AnchorPivot(Player player, ViewAnchor anchor, Vector3 playerPivot)
     {

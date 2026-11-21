@@ -28,13 +28,13 @@ internal static class FirstPersonBody
     private static Vector3 _headScale;
 
     /// <summary>
-    /// The head's rotation from the animation, and the one written over it, so a frame the animation skips (it
-    /// doesn't rewrite the bone every rendered frame) turns the same animated pose again instead of turning the
-    /// already-turned head further.
+    /// The head as the animation last posed it, the rotation written over it, and how the head sat relative to
+    /// the body when first person started.
     /// </summary>
     private static Transform _turnedHead;
     private static Quaternion _animatedRotation;
     private static Quaternion _writtenRotation;
+    private static Quaternion _headToBody;
 
     public static void Update(Player player, bool firstPerson)
     {
@@ -59,8 +59,9 @@ internal static class FirstPersonBody
     }
 
     /// <summary>
-    /// Adds the difference between where the body faces and where the player looks (yaw and pitch) to the head's
-    /// animated rotation.
+    /// Points the head exactly where the player looks. Adding the look on top of the animation overshot, as some
+    /// animations already lean the upper body towards the view; the head is hidden, so its animation isn't
+    /// needed. How the head sits relative to the body when first person starts gives its forward direction.
     /// </summary>
     private static void TurnHead(Player player)
     {
@@ -70,16 +71,19 @@ internal static class FirstPersonBody
             return;
         }
 
-        Quaternion current = head.localRotation;
-        bool animated = head != _turnedHead || current != _writtenRotation;
-        Quaternion pose = animated ? current : _animatedRotation;
+        if (head != _turnedHead)
+        {
+            _turnedHead = head;
+            _headToBody = Quaternion.Inverse(player.transform.rotation) * head.rotation;
+        }
 
-        head.localRotation = pose;
-        Quaternion look = player.m_eye.rotation * Quaternion.Inverse(player.transform.rotation);
-        head.rotation = look * head.rotation;
+        // Remember the animation's pose, to put back when leaving first person.
+        if (head.localRotation != _writtenRotation)
+        {
+            _animatedRotation = head.localRotation;
+        }
 
-        _turnedHead = head;
-        _animatedRotation = pose;
+        head.rotation = player.m_eye.rotation * _headToBody;
         _writtenRotation = head.localRotation;
     }
 
