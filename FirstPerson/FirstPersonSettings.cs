@@ -49,9 +49,9 @@ internal static class FirstPersonSettings
             new ConfigDescription("Degrees you can look to the side while standing still before your body turns to " +
                 "follow. While moving, your body always faces where you look.",
                 new AcceptableValueRange<float>(0f, 180f)));
-        _cameraOffset = config.Bind(section, "Camera Offset", new Vector3(0f, 0.05f, 0.15f),
-            "Where the first-person camera sits relative to your eyes, in metres (right, up, forward). Vanilla's " +
-            "unused first-person view sits 0.5 m forward.");
+        _cameraOffset = config.Bind(section, "Camera Offset", new Vector3(0f, 0.1f, 0.12f),
+            "Where the first-person camera sits relative to your head's pivot (the top of the neck), in metres " +
+            "right, up and forward along where you look. The camera follows the head as the animations move it.");
     }
 
     /// <summary>

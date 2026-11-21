@@ -230,7 +230,6 @@ internal static class CameraController
             _lastAnchor = anchor;
         }
 
-        camera.m_fpsOffset = FirstPersonSettings.CameraOffset;
         camera.m_minDistance = firstPersonAllowed ? 0f : Min(mode);
         camera.m_maxDistance = Max(mode);
         camera.m_maxDistanceBoat = Max(mode);
@@ -299,6 +298,12 @@ internal static class CameraController
     /// </summary>
     public static Vector3 Pivot(Player player, Vector3 playerPivot)
     {
+        if (player == Player.m_localPlayer && Anchor == ViewAnchor.Player && FirstPersonSettings.Active
+            && player.m_head != null && !player.IsDead())
+        {
+            return FirstPersonPivot(player);
+        }
+
         if (!UsesVehicleView || player != Player.m_localPlayer)
         {
             return playerPivot;
@@ -313,6 +318,15 @@ internal static class CameraController
         Vector3 from = AnchorPivot(player, _fromAnchor, playerPivot);
         float t = Mathf.SmoothStep(0f, 1f, (Time.time - _anchorChangedAt) / _transitionTime.Value);
         return Vector3.Lerp(from, to, t);
+    }
+
+    /// <summary>
+    /// In first person the camera rides on the head bone, so it follows every lean and bob of the animations
+    /// instead of the body moving in front of it. The offset turns with the view, like eyes on a neck.
+    /// </summary>
+    private static Vector3 FirstPersonPivot(Player player)
+    {
+        return player.m_head.position + (player.m_eye.rotation * FirstPersonSettings.CameraOffset);
     }
 
     private static Vector3 AnchorPivot(Player player, ViewAnchor anchor, Vector3 playerPivot)

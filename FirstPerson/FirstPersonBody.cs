@@ -14,7 +14,8 @@ namespace BetterCamera.FirstPerson;
 /// <item>Held item view: the whole body (and whatever is worn or held) is hidden from the camera, keeping its
 /// shadow. Equipment can change meanwhile, so new renderers are picked up every frame.</item>
 /// </list>
-/// Everything is put back as it was when leaving first person or switching view.
+/// In both views the head turns to face where you look, so anything worn on it (such as the Dvergr circlet's
+/// light) points at the crosshair. Everything is put back as it was when leaving first person or switching view.
 /// </summary>
 internal static class FirstPersonBody
 {
@@ -34,6 +35,8 @@ internal static class FirstPersonBody
             return;
         }
 
+        TurnHead(player);
+
         if (FirstPersonSettings.Gear == GearView.Body)
         {
             ShowRenderers();
@@ -44,6 +47,22 @@ internal static class FirstPersonBody
             RestoreHead();
             HideRenderers(player.m_visual);
         }
+    }
+
+    /// <summary>
+    /// Adds the difference between where the body faces and where the player looks (yaw and pitch) to the head's
+    /// animated rotation. The animation sets the head again every frame, so this never builds up.
+    /// </summary>
+    private static void TurnHead(Player player)
+    {
+        Transform head = player.m_head;
+        if (head == null || player.m_eye == null)
+        {
+            return;
+        }
+
+        Quaternion look = player.m_eye.rotation * Quaternion.Inverse(player.transform.rotation);
+        head.rotation = look * head.rotation;
     }
 
     public static void Restore()
