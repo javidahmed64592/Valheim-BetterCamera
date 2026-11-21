@@ -2,6 +2,7 @@ using BepInEx;
 
 using BetterCamera.Camera;
 using BetterCamera.Core;
+using BetterCamera.FirstPerson;
 using BetterCamera.UI;
 
 using HarmonyLib;
@@ -25,6 +26,7 @@ public class BetterCameraPlugin : BaseUnityPlugin
     {
         CameraController.BindConfig(Config);
         ShipHud.BindConfig(Config);
+        FirstPersonSettings.BindConfig(Config);
         Translations.Load();
 
         _harmony = new Harmony(PluginGUID);

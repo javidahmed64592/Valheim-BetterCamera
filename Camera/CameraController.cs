@@ -2,6 +2,8 @@ using System.Collections.Generic;
 
 using BepInEx.Configuration;
 
+using BetterCamera.FirstPerson;
+
 using Jotunn.Configs;
 using Jotunn.Managers;
 
@@ -296,6 +298,12 @@ internal static class CameraController
     /// </summary>
     public static Vector3 Pivot(Player player, Vector3 playerPivot)
     {
+        if (player == Player.m_localPlayer && Anchor == ViewAnchor.Player && FirstPersonSettings.Active
+            && player.m_head != null && !player.IsDead())
+        {
+            return FirstPersonPivot(player);
+        }
+
         if (!UsesVehicleView || player != Player.m_localPlayer)
         {
             return playerPivot;
@@ -311,6 +319,24 @@ internal static class CameraController
         float t = Mathf.SmoothStep(0f, 1f, (Time.time - _anchorChangedAt) / _transitionTime.Value);
         return Vector3.Lerp(from, to, t);
     }
+
+    /// <summary>
+    /// In first person the camera rides on the head bone, so it follows every lean and bob of the animations
+    /// instead of the body moving in front of it. The offset turns with the view, like eyes on a neck.
+    /// </summary>
+    private static Vector3 FirstPersonPivot(Player player)
+    {
+        // Ease the bow offset in and out over about 0.15 s.
+        float target = player.IsDrawingBow() ? 1f : 0f;
+        _bowAim = Mathf.MoveTowards(_bowAim, target, Time.deltaTime / 0.15f);
+        Vector3 offset = FirstPersonSettings.CameraOffset + (FirstPersonSettings.BowAimOffset * Mathf.SmoothStep(0f, 1f, _bowAim));
+        return player.m_head.position + (player.m_eye.rotation * offset);
+    }
+
+    /// <summary>
+    /// How far the camera has moved to the bow aiming position, 0 to 1.
+    /// </summary>
+    private static float _bowAim;
 
     private static Vector3 AnchorPivot(Player player, ViewAnchor anchor, Vector3 playerPivot)
     {
