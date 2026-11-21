@@ -27,6 +27,15 @@ internal static class FirstPersonBody
     private static Transform _head;
     private static Vector3 _headScale;
 
+    /// <summary>
+    /// The head's rotation from the animation, and the one written over it, so a frame the animation skips (it
+    /// doesn't rewrite the bone every rendered frame) turns the same animated pose again instead of turning the
+    /// already-turned head further.
+    /// </summary>
+    private static Transform _turnedHead;
+    private static Quaternion _animatedRotation;
+    private static Quaternion _writtenRotation;
+
     public static void Update(Player player, bool firstPerson)
     {
         if (!firstPerson || player == null || player.m_visual == null)
@@ -51,7 +60,7 @@ internal static class FirstPersonBody
 
     /// <summary>
     /// Adds the difference between where the body faces and where the player looks (yaw and pitch) to the head's
-    /// animated rotation. The animation sets the head again every frame, so this never builds up.
+    /// animated rotation.
     /// </summary>
     private static void TurnHead(Player player)
     {
@@ -61,14 +70,37 @@ internal static class FirstPersonBody
             return;
         }
 
+        Quaternion current = head.localRotation;
+        bool animated = head != _turnedHead || current != _writtenRotation;
+        Quaternion pose = animated ? current : _animatedRotation;
+
+        head.localRotation = pose;
         Quaternion look = player.m_eye.rotation * Quaternion.Inverse(player.transform.rotation);
         head.rotation = look * head.rotation;
+
+        _turnedHead = head;
+        _animatedRotation = pose;
+        _writtenRotation = head.localRotation;
+    }
+
+    /// <summary>
+    /// Puts the head back to its animated pose if the animation hasn't already.
+    /// </summary>
+    private static void RestoreHeadTurn()
+    {
+        if (_turnedHead != null && _turnedHead.localRotation == _writtenRotation)
+        {
+            _turnedHead.localRotation = _animatedRotation;
+        }
+
+        _turnedHead = null;
     }
 
     public static void Restore()
     {
         ShowRenderers();
         RestoreHead();
+        RestoreHeadTurn();
     }
 
     private static void ShrinkHead(Transform head)
