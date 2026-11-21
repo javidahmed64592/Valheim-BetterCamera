@@ -6,7 +6,7 @@ namespace BetterCamera.Camera;
 internal enum TravelMode { Walking = 0, Sailing = 1, Riding = 2 }
 
 /// <summary>
-/// What the camera orbits while sailing or riding.
+/// What the camera orbits while steering a ship.
 /// </summary>
 internal enum ViewAnchor
 {
@@ -16,7 +16,7 @@ internal enum ViewAnchor
     Player = 0,
 
     /// <summary>
-    /// The middle of the ship or mount, raised a little.
+    /// The middle of the ship, raised a few metres.
     /// </summary>
     Centre = 1,
 }

@@ -7,7 +7,7 @@ using UnityEngine;
 namespace BetterCamera.Patches;
 
 /// <summary>
-/// Moves the point the camera orbits to the current view's (the ship's or mount's centre, overview or front).
+/// Moves the point the camera orbits to the ship's centre while that view is on.
 /// </summary>
 [HarmonyPatch(typeof(GameCamera), "GetOffsetedEyePos")]
 internal static class GameCamera_GetOffsetedEyePos_Patch
