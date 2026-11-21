@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 using BepInEx.Configuration;
 
+using BetterCamera.Core;
 using BetterCamera.FirstPerson;
 
 using Jotunn.Configs;
@@ -16,15 +17,17 @@ namespace BetterCamera.Camera;
 /// <list type="bullet">
 /// <item>Walking, sailing (steering a ship) and riding each have their own minimum and maximum zoom, and each
 /// remembers its own zoom level, which comes back when returning to that mode.</item>
-/// <item>Zooming in past the minimum enters first person at the eyes (vanilla's own first person offset), with the
-/// body hidden; zooming out of it returns to the minimum.</item>
-/// <item>While steering a ship, the cycle key switches what the camera orbits between the player (vanilla) and the
-/// ship's centre. Switching blends over a short time.</item>
+/// <item>Zooming in past the minimum enters first person (see FirstPersonBody); zooming out of it returns to the
+/// minimum.</item>
+/// <item>While steering a ship, the ship view key (Shift + C) switches what the camera orbits between the player
+/// (vanilla) and the ship's centre. Switching blends over a short time.</item>
+/// <item>The shoulder key moves the third-person camera between the right shoulder (vanilla) and the left, by
+/// mirroring vanilla's sideways offset. It blends over the same time.</item>
 /// </list>
 /// </summary>
 internal static class CameraController
 {
-    private const string ButtonName = "BetterCamera_CycleView";
+    private const string ShoulderButtonName = "BetterCamera_SwitchShoulder";
 
     private sealed class ZoomConfig
     {
@@ -34,7 +37,8 @@ internal static class CameraController
 
     private static readonly Dictionary<TravelMode, ZoomConfig> Zoom = [];
     private static ConfigEntry<bool> _firstPerson;
-    private static ConfigEntry<KeyCode> _cycleKey;
+    private static ConfigEntry<KeyboardShortcut> _cycleKey;
+    private static ConfigEntry<KeyCode> _shoulderKey;
     private static ConfigEntry<float> _shipLift;
     private static ConfigEntry<float> _transitionTime;
 
@@ -60,7 +64,14 @@ internal static class CameraController
     private static ViewAnchor _fromAnchor = ViewAnchor.Player;
     private static float _anchorChangedAt = -100f;
 
-    private static string ButtonQueryName => ButtonName + "!" + BetterCameraPlugin.PluginGUID;
+    /// <summary>
+    /// True while the third-person camera is over the left shoulder.
+    /// </summary>
+    private static bool _leftShoulder;
+
+    private static float _shoulderChangedAt = -100f;
+
+    private static string ShoulderButtonQueryName => ShoulderButtonName + "!" + BetterCameraPlugin.PluginGUID;
 
     public static void BindConfig(ConfigFile config)
     {
@@ -69,14 +80,15 @@ internal static class CameraController
         Zoom[TravelMode.Riding] = BindZoom(config, "Riding", 1f, 24f, "riding a tamed animal");
 
         _firstPerson = config.Bind("Zoom", "First Person", true,
-            "Zooming in past the minimum distance switches to first person, with your body hidden. " +
+            "Zooming in past the minimum distance switches to first person, seeing your own arms and gear. " +
             "Zooming out again returns to third person.");
 
-        _cycleKey = config.Bind("Keybinds", "Cycle View", KeyCode.C,
-            "While steering a ship, switches the camera between following you and following the ship's centre. " +
-            "While steering, this key no longer toggles walking. " +
+        _cycleKey = config.Bind("Keybinds", "Switch Ship View", new KeyboardShortcut(KeyCode.C, KeyCode.LeftShift),
+            "While steering a ship, switches the camera between following you and following the ship's centre.");
+        _shoulderKey = config.Bind("Keybinds", "Switch Shoulder", KeyCode.K,
+            "In third person, moves the camera between your right shoulder (vanilla) and your left. " +
             "Rebindable from the in-game controls menu.");
-        InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = ButtonName, Config = _cycleKey });
+        InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = ShoulderButtonName, Config = _shoulderKey });
 
         const string views = "Views";
         _shipLift = config.Bind(views, "Ship Height", 4.5f,
@@ -120,7 +132,7 @@ internal static class CameraController
     }
 
     /// <summary>
-    /// True while the local player steers a ship, when the cycle key is theirs and C doesn't toggle walking.
+    /// True while the local player steers a ship, when the ship view key is theirs.
     /// </summary>
     internal static bool Steering(Player player)
     {
@@ -148,17 +160,19 @@ internal static class CameraController
         _lastAnchor = ViewAnchor.Player;
         _inFirstPerson = false;
         _anchorChangedAt = -100f;
+        _shoulderChangedAt = -100f;
         FirstPersonBody.Restore();
     }
 
     // ----- Per frame -----
 
     /// <summary>
-    /// The cycle key, from the plugin's Update.
+    /// The ship view key, from the plugin's Update.
     /// </summary>
     public static void UpdateInput(Player player)
     {
-        if (!Steering(player) || Blocked() || !ZInput.GetButtonDown(ButtonQueryName))
+        UpdateShoulderInput(player);
+        if (!CycleKeyDown(player))
         {
             return;
         }
@@ -171,6 +185,33 @@ internal static class CameraController
         Anchors[mode] = next;
         player.Message(MessageHud.MessageType.TopLeft,
             Localization.instance.Localize("$bettercamera_view", Localization.instance.Localize(AnchorToken(next))));
+    }
+
+    /// <summary>
+    /// The shoulder key, in third person only: in first person there's no shoulder to look over.
+    /// </summary>
+    private static void UpdateShoulderInput(Player player)
+    {
+        GameCamera camera = GameCamera.instance;
+        if (camera == null || camera.m_freeFly || camera.m_distance <= 0f || Blocked()
+            || !ZInput.GetButtonDown(ShoulderButtonQueryName))
+        {
+            return;
+        }
+
+        _leftShoulder = !_leftShoulder;
+        _shoulderChangedAt = Time.time;
+        string token = _leftShoulder ? "$bettercamera_view_left_shoulder" : "$bettercamera_view_right_shoulder";
+        player.Message(MessageHud.MessageType.TopLeft,
+            Localization.instance.Localize("$bettercamera_view", Localization.instance.Localize(token)));
+    }
+
+    /// <summary>
+    /// True on the frame the ship view key is pressed while steering.
+    /// </summary>
+    internal static bool CycleKeyDown(Player player)
+    {
+        return Steering(player) && !Blocked() && KeyInput.IsDown(_cycleKey.Value);
     }
 
     private static string AnchorToken(ViewAnchor anchor)
@@ -304,7 +345,13 @@ internal static class CameraController
             return FirstPersonPivot(player);
         }
 
-        if (!UsesVehicleView || player != Player.m_localPlayer)
+        if (player != Player.m_localPlayer)
+        {
+            return playerPivot;
+        }
+
+        playerPivot += ShoulderShift(player);
+        if (!UsesVehicleView)
         {
             return playerPivot;
         }
@@ -331,6 +378,30 @@ internal static class CameraController
         _bowAim = Mathf.MoveTowards(_bowAim, target, Time.deltaTime / 0.15f);
         Vector3 offset = FirstPersonSettings.CameraOffset + (FirstPersonSettings.BowAimOffset * Mathf.SmoothStep(0f, 1f, _bowAim));
         return player.m_head.position + (player.m_eye.rotation * offset);
+    }
+
+    /// <summary>
+    /// Moves vanilla's third-person pivot from the right shoulder towards the left: vanilla adds its offset (0.3 m
+    /// right in the default camera) along the eye's axes, so this adds twice its sideways part the other way, blended
+    /// while switching.
+    /// </summary>
+    private static Vector3 ShoulderShift(Player player)
+    {
+        GameCamera camera = GameCamera.instance;
+        if (camera == null || camera.m_distance <= 0f || player.InBed() || player.m_eye == null)
+        {
+            return Vector3.zero;
+        }
+
+        float t = _transitionTime.Value <= 0f ? 1f : Mathf.SmoothStep(0f, 1f, (Time.time - _shoulderChangedAt) / _transitionTime.Value);
+        float left = _leftShoulder ? t : 1f - t;
+        if (left <= 0f)
+        {
+            return Vector3.zero;
+        }
+
+        Vector3 offset = player.UseMeleeCamera() ? camera.m_3rdCombatOffset : camera.m_3rdOffset;
+        return player.m_eye.TransformVector(Vector3.left * (2f * offset.x * left));
     }
 
     /// <summary>
