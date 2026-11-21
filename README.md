@@ -6,14 +6,14 @@
 
 Play Valheim in first person, and get more control over the camera while walking, sailing and riding.
 
-- **First person**: Zoom all the way in to play through your character's eyes, with your arms, gear and the game's own animations.
+- **First person**: Zoom all the way in to play through your character's eyes.
 - **Ship view**: While steering a ship, press `Shift+C` to switch the camera to follow the ship's centre.
 - **Switch shoulders**: Press `K` to move the third-person camera between your right and left shoulder.
 - **Zoom further**: Zoom out up to 16 m while walking, 40 m while steering a ship and 24 m while riding (vanilla 8 m, 16 m on ships). Each has its own limits in the config and remembers its own zoom.
 
 ## First Person
 
-Zoom in past the closest third-person distance to switch to first person, and zoom out to leave it. It stays on when you take the helm or mount up.
+Zoom in past the closest third-person distance to switch to first person, and zoom out to leave it.
 
 - Your body stays visible apart from the head, so you see your arms and gear with the game's own animations.
 - Bows, spears, staffs and other ranged attacks fly to the crosshair.
@@ -27,7 +27,7 @@ Zoom in past the closest third-person distance to switch to first person, and zo
 
 ## Ship View
 
-While steering a ship, press `Shift+C` to switch the camera between following you and following the centre of the ship, so you can look all around it. `C` on its own still toggles walking.
+While steering a ship, press `Shift+C` to switch the camera between following you and following the centre of the ship, so you can look all around it.
 
 ![Sailing Zoomed Out](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/sailing_zoomed_out.png)
 
