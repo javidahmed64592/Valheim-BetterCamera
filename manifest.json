@@ -1,6 +1,6 @@
 {
   "name": "BetterCamera",
-  "description": "Play Valheim in first person, and get more control over the camera while walking, sailing and riding.",
+  "description": "Play Valheim in first person, take pictures in photo mode, and get more control over the camera while walking, sailing and riding.",
   "version_number": "0.2.0",
   "dependencies": [
     "denikson-BepInExPack_Valheim-5.4.2360",

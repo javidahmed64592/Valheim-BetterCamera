@@ -4,9 +4,10 @@
 
 # BetterCamera
 
-Play Valheim in first person, and get more control over the camera while walking, sailing and riding.
+Play Valheim in first person, take pictures in photo mode, and get more control over the camera while walking, sailing and riding.
 
 - **First person**: Zoom all the way in to play through your character's eyes.
+- **Photo mode**: Press `J` for a free camera to take pictures, while your character stands still.
 - **Ship view**: While steering a ship, press `Shift+C` to switch the camera to follow the ship's centre.
 - **Switch shoulders**: Press `K` to move the third-person camera between your right and left shoulder.
 - **Zoom further**: Zoom out up to 16 m while walking, 40 m while steering a ship and 24 m while riding (vanilla 8 m, 16 m on ships). Each has its own limits in the config and remembers its own zoom.
@@ -30,6 +31,26 @@ Zoom in past the closest third-person distance to switch to first person, and zo
 While steering a ship, press `Shift+C` to switch the camera between following you and following the centre of the ship, so you can look all around it.
 
 ![Sailing Zoomed Out](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/sailing_zoomed_out.png)
+
+## Photo Mode
+
+Press `J` to fly a free camera around your character (up to 100 m away) and line up a shot. Your character stands still while the world keeps going, and photo mode ends if you take damage. The hotbar, map and health are hidden, and every control is shown at the bottom right.
+
+| Key            | Action                                                     |
+| -------------- | ---------------------------------------------------------- |
+| `W A S D`      | Move.                                                      |
+| `Space` / `Ctrl` | Move up / down.                                          |
+| `Shift`        | Move faster.                                               |
+| `Scroll`       | Zoom.                                                      |
+| `Alt+Scroll`   | Change the speed.                                          |
+| `Q` / `E`      | Roll the camera.                                           |
+| `R`            | Reset the roll and zoom.                                   |
+| `Left-Click`   | Keep looking at what's under the crosshair.                |
+| `Middle-Click` | Move along with what's under the crosshair, such as a ship or a creature. |
+| `Tab`          | Open the inventory to change your gear.                    |
+| `U`            | Hide or show the rest of the UI.                           |
+| `F11`          | Take a screenshot (vanilla, saved in Valheim's `screenshots` folder). |
+| `J`            | Leave photo mode.                                          |
 
 ## Configuration
 

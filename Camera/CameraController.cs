@@ -219,7 +219,7 @@ internal static class CameraController
         return anchor == ViewAnchor.Centre ? "$bettercamera_view_ship_centre" : "$bettercamera_view_player";
     }
 
-    private static bool Blocked()
+    internal static bool Blocked()
     {
         return Menu.IsVisible()
             || InventoryGui.IsVisible()
