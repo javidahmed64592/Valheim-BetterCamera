@@ -44,6 +44,18 @@ internal static class CameraController
     private static bool _modeKnown;
     private static float _distanceBefore;
 
+    /// <summary>
+    /// The view the camera had last frame, to notice when it changes.
+    /// </summary>
+    private static ViewAnchor _lastAnchor = ViewAnchor.Player;
+
+    /// <summary>
+    /// True from zooming into first person until zooming out of it. It carries over when getting on or off a
+    /// ship or mount, and back from the centre view (which can't be first person), so the camera only leaves
+    /// first person when the player zooms out.
+    /// </summary>
+    private static bool _inFirstPerson;
+
     private static ViewAnchor _fromAnchor = ViewAnchor.Player;
     private static float _anchorChangedAt = -100f;
 
@@ -134,6 +146,8 @@ internal static class CameraController
         Anchors.Clear();
         _modeKnown = false;
         _mode = TravelMode.Walking;
+        _lastAnchor = ViewAnchor.Player;
+        _inFirstPerson = false;
         _anchorChangedAt = -100f;
         FirstPersonBody.Restore();
     }
@@ -189,9 +203,11 @@ internal static class CameraController
         }
 
         TravelMode mode = ModeOf(player);
-        if (!_modeKnown || mode != _mode)
+        bool modeChanged = !_modeKnown || mode != _mode;
+        if (modeChanged)
         {
-            if (_modeKnown)
+            // Each mode remembers its third-person zoom; first person is carried over separately.
+            if (_modeKnown && camera.m_distance > 0f)
             {
                 Distances[_mode] = camera.m_distance;
             }
@@ -199,22 +215,40 @@ internal static class CameraController
             _mode = mode;
             _modeKnown = true;
             _anchorChangedAt = -100f;
-            camera.m_distance = Distances.TryGetValue(mode, out float distance)
-                ? distance
-                : Mathf.Clamp(camera.m_distance, Min(mode), Max(mode));
         }
 
         // First person only around the player: inside a ship or a mount there's nothing to see.
-        bool firstPerson = _firstPerson.Value && Anchor == ViewAnchor.Player;
-        camera.m_minDistance = firstPerson ? 0f : Min(mode);
+        ViewAnchor anchor = Anchor;
+        bool firstPersonAllowed = _firstPerson.Value && anchor == ViewAnchor.Player;
+        if (modeChanged || anchor != _lastAnchor)
+        {
+            // Switching view within a mode: keep its third-person zoom from either view.
+            if (!modeChanged && camera.m_distance > 0f)
+            {
+                Distances[mode] = camera.m_distance;
+            }
+
+            camera.m_distance = firstPersonAllowed && _inFirstPerson ? 0f : ThirdPersonDistance(mode, camera.m_distance);
+            _lastAnchor = anchor;
+        }
+
+        camera.m_minDistance = firstPersonAllowed ? 0f : Min(mode);
         camera.m_maxDistance = Max(mode);
         camera.m_maxDistanceBoat = Max(mode);
-        if (!firstPerson && camera.m_distance < Min(mode))
+        if (!firstPersonAllowed && camera.m_distance < Min(mode))
         {
             camera.m_distance = Min(mode);
         }
 
         _distanceBefore = camera.m_distance;
+    }
+
+    /// <summary>
+    /// The mode's remembered third-person zoom, or the current one within its limits.
+    /// </summary>
+    private static float ThirdPersonDistance(TravelMode mode, float current)
+    {
+        return Distances.TryGetValue(mode, out float distance) ? distance : Mathf.Clamp(current, Min(mode), Max(mode));
     }
 
     /// <summary>
@@ -241,6 +275,12 @@ internal static class CameraController
                 camera.GetCameraPosition(dt, out Vector3 position, out Quaternion rotation);
                 camera.transform.SetPositionAndRotation(position, rotation);
             }
+        }
+
+        // Only zooming changes this: around the player, first person is exactly zoom 0.
+        if (Anchor == ViewAnchor.Player)
+        {
+            _inFirstPerson = camera.m_distance <= 0f;
         }
 
         FirstPersonBody.Update(player, camera.m_distance <= 0f && !player.IsDead());
@@ -304,11 +344,13 @@ internal static class CameraController
     }
 
     /// <summary>
-    /// Above the middle of the top of the mount's collider.
+    /// Above the mount's own position, at the height of the top of its collider. The collider isn't always
+    /// centred on the body (the lox's sits off to one side), so it only gives the height.
     /// </summary>
     private static Vector3 MountPivot(Character mount)
     {
-        Bounds bounds = mount.GetCollider().bounds;
-        return new Vector3(bounds.center.x, bounds.max.y, bounds.center.z) + (Vector3.up * _mountLift.Value);
+        Vector3 position = mount.transform.position;
+        float top = mount.GetCollider().bounds.max.y;
+        return new Vector3(position.x, top + _mountLift.Value, position.z);
     }
 }

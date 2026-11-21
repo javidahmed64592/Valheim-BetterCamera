@@ -8,21 +8,29 @@ Zoom further out or into first person, with zoom limits for walking, sailing and
 
 - **Zoom further**: Zoom out up to 16 m while walking, 40 m while steering a ship and 24 m while riding.
 - **First person**: Zoom all the way in to look around through your character's eyes.
-- **Travel views**: While steering a ship or riding, switch the camera to follow the ship's or mount's centre, so you can look all around it.
+- **Travel views**: While steering a ship or riding, switch the camera by pressing `C` to follow the ship's or mount's centre, so you can look all around it.
 
-## Zoom
+## Camera Views
 
-Scroll to zoom as in vanilla. Walking (and swimming), steering a ship, and riding a tamed animal each have their own closest and furthest distance, and each remembers how far you were zoomed, so getting off a ship brings back your walking zoom.
+### Walking (Zoomed Out)
 
-Zoom in past the closest distance to switch to first person. Your body is hidden so it doesn't block the view, but its shadow stays. Zoom out to go back to third person. First person is a way to look around: attacking and building work, but aren't adjusted for it yet.
+![Walking Zoomed Out](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/walking_zoomed_out.png)
 
-## Travel Views
+### Walking (First Person)
 
-While steering a ship or riding, press `C` to switch the camera between following you, as in vanilla, and following the centre of the ship or mount. Turning the camera then swings it around the whole ship or mount instead of around you at the helm or in the saddle, which makes it much easier to see what's around you.
+![Walking First Person](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/walking_first_person.png)
 
-- The camera moves smoothly to the new view. The ship and the mount each remember the view you last used.
-- First person is only available while the camera follows you.
-- While steering or riding, `C` no longer toggles walking, which has no effect on a ship or a mount. Rebind the key in the game's controls menu.
+### Sailing (Zoomed Out)
+
+![Sailing Zoomed Out](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/sailing_zoomed_out.png)
+
+### Sailing (First Person)
+
+![Sailing First Person](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/sailing_first_person.png)
+
+### Riding (Zoomed Out)
+
+![Riding Zoomed Out](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/riding_zoomed_out.png)
 
 ## Configuration
 
