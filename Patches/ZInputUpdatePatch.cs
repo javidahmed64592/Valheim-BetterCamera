@@ -7,9 +7,9 @@ using HarmonyLib;
 namespace BetterCamera.Patches;
 
 /// <summary>
-/// While steering a ship, the walk toggle does nothing useful, and its key (C by default) switches the camera view
-/// instead. Straight after the game reads the keys, this cancels the walk toggle's press for the frame, so the
-/// player doesn't end up walking after leaving the helm.
+/// The ship view key (Shift + C by default) includes the walk toggle's key. Straight after the game reads the keys,
+/// this cancels the walk toggle's press on the frame the ship view key is used, so switching the view doesn't also
+/// toggle walking.
 /// </summary>
 [HarmonyPatch(typeof(ZInput), nameof(ZInput.Update))]
 internal static class ZInput_Update_Patch
@@ -25,7 +25,7 @@ internal static class ZInput_Update_Patch
         // ZInput.Update is static, so the buttons come from the instance.
         ZInput input = ZInput.instance;
         if (input != null
-            && CameraController.Steering(Player.m_localPlayer)
+            && CameraController.CycleKeyDown(Player.m_localPlayer)
             && Buttons(input).TryGetValue(ToggleWalk, out ZInput.ButtonDef button)
             && button.Pressed)
         {

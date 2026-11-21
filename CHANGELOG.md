@@ -3,12 +3,14 @@
 ## Unreleased
 
 - First person is now made for playing, not just looking around:
-  - Your body stays visible apart from the head, so you see your arms and gear with the game's own animations. Set `Gear View` to `HeldItem` to hide the body instead.
+  - Your body stays visible apart from the head, so you see your arms and gear with the game's own animations.
   - Bows, spears, staffs and other ranged attacks fly to where the crosshair points.
   - Your body turns with your head once you look more than 60° to the side (`Body Turn Angle`), and always faces where you look while moving.
   - The camera moves with your head as the animations lean and bob, and lights worn on your head (like the Dvergr circlet's) shine at the crosshair.
   - Your hands and gear are no longer cut off close to the camera, and while drawing a bow the view shifts slightly so the bow doesn't cover the crosshair (`Bow Aim Offset`).
   - Looking down stops at 65° (`Max Look Down`), so the camera doesn't see inside your armour.
+- Press `K` to move the third-person camera between your right and left shoulder.
+- The ship view key is now `Shift+C` (setting `Switch Ship View`), so `C` toggles walking as in vanilla, even at the helm.
 
 ## 0.1.0
 

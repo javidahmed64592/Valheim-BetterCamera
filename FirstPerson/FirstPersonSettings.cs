@@ -5,27 +5,10 @@ using UnityEngine;
 namespace BetterCamera.FirstPerson;
 
 /// <summary>
-/// How your gear shows in first person.
-/// </summary>
-internal enum GearView
-{
-    /// <summary>
-    /// Your whole body except the head, with the game's own animations.
-    /// </summary>
-    Body = 0,
-
-    /// <summary>
-    /// The body hidden and what you hold shown at the bottom of the screen.
-    /// </summary>
-    HeldItem = 1,
-}
-
-/// <summary>
 /// First-person settings, and whether the local player is in first person right now.
 /// </summary>
 internal static class FirstPersonSettings
 {
-    private static ConfigEntry<GearView> _gearView;
     private static ConfigEntry<float> _turnAngle;
     private static ConfigEntry<Vector3> _cameraOffset;
     private static ConfigEntry<Vector3> _bowAimOffset;
@@ -35,8 +18,6 @@ internal static class FirstPersonSettings
     /// The camera's near clip plane in first person, close enough for the hands and gear (vanilla 0.1 to 0.5 m).
     /// </summary>
     public const float NearClip = 0.05f;
-
-    public static GearView Gear => _gearView.Value;
 
     /// <summary>
     /// How far, in degrees, you can look away from where your body faces before it turns to follow.
@@ -55,10 +36,6 @@ internal static class FirstPersonSettings
     public static void BindConfig(ConfigFile config)
     {
         const string section = "First Person";
-        _gearView = config.Bind(section, "Gear View", GearView.Body,
-            "How your gear shows in first person. Body: your body stays visible apart from the head, so you see " +
-            "your arms and gear with the game's own animations. HeldItem: your body is hidden and what you hold is " +
-            "shown at the bottom of the screen.");
         _turnAngle = config.Bind(section, "Body Turn Angle", 60f,
             new ConfigDescription("Degrees you can look to the side while standing still before your body turns to " +
                 "follow. While moving, your body always faces where you look.",

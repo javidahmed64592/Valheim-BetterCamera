@@ -1,5 +1,7 @@
 {
   "bettercamera_view": "Camera: $1",
   "bettercamera_view_player": "Character",
-  "bettercamera_view_ship_centre": "Ship centre"
+  "bettercamera_view_ship_centre": "Ship centre",
+  "bettercamera_view_left_shoulder": "Left shoulder",
+  "bettercamera_view_right_shoulder": "Right shoulder"
 }
