@@ -4,7 +4,7 @@
 
 # BetterCamera
 
-Play in first person with your own arms and gear, and get more control over the camera while walking, sailing and riding.
+Play Valheim in first person, and get more control over the camera while walking, sailing and riding.
 
 - **First person**: Zoom all the way in to play through your character's eyes, with your arms, gear and the game's own animations.
 - **Ship view**: While steering a ship, press `Shift+C` to switch the camera to follow the ship's centre.
