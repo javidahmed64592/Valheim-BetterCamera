@@ -13,6 +13,8 @@ internal static class FirstPersonSettings
     private static ConfigEntry<Vector3> _cameraOffset;
     private static ConfigEntry<Vector3> _bowAimOffset;
     private static ConfigEntry<float> _maxLookDown;
+    private static ConfigEntry<float> _seatedTurnAngle;
+    private static ConfigEntry<float> _seatedMaxLookDown;
 
     /// <summary>
     /// The camera's near clip plane in first person, close enough for the hands and gear (vanilla 0.1 to 0.5 m).
@@ -33,6 +35,16 @@ internal static class FirstPersonSettings
     /// </summary>
     public static float MaxLookDown => _maxLookDown.Value;
 
+    /// <summary>
+    /// While seated, how far you can look to either side of where the seat faces, in degrees.
+    /// </summary>
+    public static float SeatedTurnAngle => _seatedTurnAngle.Value;
+
+    /// <summary>
+    /// While seated, the furthest you can look down, in degrees below level.
+    /// </summary>
+    public static float SeatedMaxLookDown => _seatedMaxLookDown.Value;
+
     public static void BindConfig(ConfigFile config)
     {
         const string section = "First Person";
@@ -49,6 +61,13 @@ internal static class FirstPersonSettings
         _maxLookDown = config.Bind(section, "Max Look Down", 65f,
             new ConfigDescription("The furthest you can look down in first person, in degrees below level, so the " +
                 "camera doesn't see inside your armour and body (vanilla 89).",
+                new AcceptableValueRange<float>(30f, 89f)));
+        _seatedTurnAngle = config.Bind(section, "Seated Turn Angle", 110f,
+            new ConfigDescription("While seated (at the helm, on a chair or riding), how far you can look to either " +
+                "side, in degrees, so you can look over your shoulders without seeing inside your body.",
+                new AcceptableValueRange<float>(30f, 180f)));
+        _seatedMaxLookDown = config.Bind(section, "Seated Max Look Down", 60f,
+            new ConfigDescription("While seated, the furthest you can look down, in degrees below level.",
                 new AcceptableValueRange<float>(30f, 89f)));
     }
 

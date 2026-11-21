@@ -7,6 +7,7 @@
   - Ranged attacks fly to the crosshair, and drawing a bow shifts the view so the bow doesn't cover it.
   - Your body turns to follow your view past 60° (`Body Turn Angle`) and always faces where you look while moving.
   - Head-worn lights shine at the crosshair, and looking down stops at 65° (`Max Look Down`).
+- While seated in first person (at the helm, on a chair or riding), you can look over your shoulders and down at your legs, but not behind you (`Seated Turn Angle`, `Seated Max Look Down`).
 - Press `K` to switch the third-person camera between your right and left shoulder.
 - The ship view key is now `Shift+C`, so `C` toggles walking as in vanilla.
 
