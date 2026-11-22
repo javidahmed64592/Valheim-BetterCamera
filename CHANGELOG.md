@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.1
+
+- In first person, berry bushes and other plants no longer vanish when you walk right up to them.
+
 ## 0.5.0
 
 - In photo mode, press `H` to hide your character for shots of the scenery, and `C` to bring the camera back to just behind them.
