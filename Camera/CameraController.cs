@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 
 using BepInEx.Configuration;
 
@@ -41,6 +42,23 @@ internal static class CameraController
     private static ConfigEntry<KeyCode> _shoulderKey;
     private static ConfigEntry<float> _shipLift;
     private static ConfigEntry<float> _transitionTime;
+    private static ConfigEntry<bool> _leftShoulderSaved;
+    private static ConfigEntry<float> _thirdPersonFov;
+    private static ConfigEntry<float> _firstPersonFov;
+
+    /// <summary>
+    /// The field of view the camera has now, easing between the third and first person settings.
+    /// </summary>
+    private static float _fov;
+
+    /// <summary>
+    /// The head's resting place relative to the body for Head Bob, the frame it was last moved on, and whether
+    /// it's set.
+    /// </summary>
+    private static Vector3 _steadyHead;
+
+    private static int _steadyHeadFrame = -1;
+    private static bool _hasSteadyHead;
 
     private static readonly Dictionary<TravelMode, float> Distances = [];
     private static readonly Dictionary<TravelMode, ViewAnchor> Anchors = [];
@@ -95,7 +113,26 @@ internal static class CameraController
             new ConfigDescription("Metres above the waterline of the ship's centre view.", new AcceptableValueRange<float>(0f, 20f)));
         _transitionTime = config.Bind(views, "Transition Time", 0.4f,
             new ConfigDescription("Seconds the camera takes to move to a new view.", new AcceptableValueRange<float>(0f, 2f)));
+        _leftShoulderSaved = config.Bind(views, "Left Shoulder", false,
+            "Whether the third-person camera is over your left shoulder. The shoulder key changes it, and it's " +
+            "remembered between games.");
+        _leftShoulder = _leftShoulderSaved.Value;
+
+        const string fov = "Field of View";
+        _thirdPersonFov = config.Bind(fov, "Third Person", 65f,
+            new ConfigDescription("The camera's field of view in third person, in degrees (vanilla 65). Alt + " +
+                "scroll changes the one you're in while playing.",
+                new AcceptableValueRange<float>(MinFov, MaxFov)));
+        _firstPersonFov = config.Bind(fov, "First Person", 65f,
+            new ConfigDescription("The camera's field of view in first person, in degrees (vanilla 65). A wider " +
+                "view can feel less cramped.",
+                new AcceptableValueRange<float>(MinFov, MaxFov)));
     }
+
+    /// <summary>
+    /// The field of view while playing, which photo mode starts from and resets to.
+    /// </summary>
+    public static float GameplayFov => _fov > 0f ? _fov : _thirdPersonFov.Value;
 
     private static ZoomConfig BindZoom(ConfigFile config, string mode, float min, float max, string what)
     {
@@ -172,6 +209,7 @@ internal static class CameraController
     public static void UpdateInput(Player player)
     {
         UpdateShoulderInput(player);
+        UpdateFovInput(player);
         if (!CycleKeyDown(player))
         {
             return;
@@ -188,6 +226,59 @@ internal static class CameraController
     }
 
     /// <summary>
+    /// Degrees each Alt+scroll notch changes the field of view by.
+    /// </summary>
+    private const float FovStep = 5f;
+
+    /// <summary>
+    /// True while reading the scroll wheel for the field of view, so the scroll patch lets it through.
+    /// </summary>
+    private static bool _readingFovScroll;
+
+    /// <summary>
+    /// Alt+scroll changes the field of view, and vanilla's zoom doesn't also get the scroll. Only without a build
+    /// tool out (the hammer and hoe use Alt+scroll themselves, in BetterHammer and BetterHoe) and outside photo
+    /// mode (which uses it for speed).
+    /// </summary>
+    internal static bool FovScrollActive(Player player)
+    {
+        return !_readingFovScroll
+            && player != null
+            && (ZInput.GetKey(KeyCode.LeftAlt) || ZInput.GetKey(KeyCode.RightAlt))
+            && !player.InPlaceMode()
+            && !Photo.PhotoMode.Active
+            && !Blocked();
+    }
+
+    /// <summary>
+    /// Alt+scroll: changes the field of view of the view you're in (first or third person) and saves it.
+    /// </summary>
+    private static void UpdateFovInput(Player player)
+    {
+        if (!FovScrollActive(player))
+        {
+            return;
+        }
+
+        _readingFovScroll = true;
+        float scroll = ZInput.GetMouseScrollWheel();
+        _readingFovScroll = false;
+        if (scroll == 0f)
+        {
+            return;
+        }
+
+        ConfigEntry<float> setting = FirstPersonSettings.Active ? _firstPersonFov : _thirdPersonFov;
+        float step = scroll > 0f ? -FovStep : FovStep;
+        setting.Value = Mathf.Clamp(Mathf.Round((setting.Value + step) / FovStep) * FovStep, MinFov, MaxFov);
+        string text = Localization.instance.Localize("$bettercamera_fov", setting.Value.ToString("0", CultureInfo.CurrentCulture));
+        MessageHud.instance?.ShowMessage(MessageHud.MessageType.Center, text, log: false);
+    }
+
+    private const float MinFov = 30f;
+    private const float MaxFov = 120f;
+
+    /// <summary>
     /// The shoulder key, in third person only: in first person there's no shoulder to look over.
     /// </summary>
     private static void UpdateShoulderInput(Player player)
@@ -200,6 +291,7 @@ internal static class CameraController
         }
 
         _leftShoulder = !_leftShoulder;
+        _leftShoulderSaved.Value = _leftShoulder;
         _shoulderChangedAt = Time.time;
         string token = _leftShoulder ? "$bettercamera_view_left_shoulder" : "$bettercamera_view_right_shoulder";
         player.Message(MessageHud.MessageType.TopLeft,
@@ -322,8 +414,36 @@ internal static class CameraController
             _inFirstPerson = camera.m_distance <= 0f;
         }
 
-        FirstPersonBody.Update(player, camera.m_distance <= 0f && !player.IsDead());
+        bool firstPerson = camera.m_distance <= 0f && !player.IsDead();
+        FirstPersonBody.Update(player, firstPerson);
+        if (!firstPerson)
+        {
+            _hasSteadyHead = false;
+        }
+
+        ApplyFov(camera, FirstPersonSettings.Active ? _firstPersonFov.Value : _thirdPersonFov.Value);
     }
+
+    /// <summary>
+    /// Sets the field of view after vanilla sets its own, easing between the third and first person values.
+    /// </summary>
+    private static void ApplyFov(GameCamera camera, float target)
+    {
+        _fov = _fov <= 0f ? target : Mathf.Lerp(_fov, target, 1f - Mathf.Exp(-FovEaseRate * Time.unscaledDeltaTime));
+        camera.m_camera.fieldOfView = _fov;
+        camera.m_skyCamera.fieldOfView = _fov;
+    }
+
+    /// <summary>
+    /// How quickly the field of view eases to a new value, per second.
+    /// </summary>
+    private const float FovEaseRate = 10f;
+
+    /// <summary>
+    /// How quickly the steady head follows the real one for Head Bob, per second: slow enough to smooth out the
+    /// bob of walking and running, fast enough to follow crouching and sitting.
+    /// </summary>
+    private const float SteadyHeadRate = 4f;
 
     // ----- Views -----
 
@@ -369,7 +489,8 @@ internal static class CameraController
 
     /// <summary>
     /// In first person the camera rides on the head bone, so it follows every lean and bob of the animations
-    /// instead of the body moving in front of it. The offset turns with the view, like eyes on a neck.
+    /// instead of the body moving in front of it. The offset turns with the view, like eyes on a neck. Head Bob
+    /// below 1 blends towards a steadied head (its place on the body, smoothed), for a calmer view.
     /// </summary>
     private static Vector3 FirstPersonPivot(Player player)
     {
@@ -377,7 +498,7 @@ internal static class CameraController
         float target = player.IsDrawingBow() ? 1f : 0f;
         _bowAim = Mathf.MoveTowards(_bowAim, target, Time.deltaTime / 0.15f);
         Vector3 offset = FirstPersonSettings.CameraOffset + (FirstPersonSettings.BowAimOffset * Mathf.SmoothStep(0f, 1f, _bowAim));
-        return player.m_head.position + (player.m_eye.rotation * offset);
+        return SteadiedHead(player) + (player.m_eye.rotation * offset);
     }
 
     /// <summary>
@@ -402,6 +523,28 @@ internal static class CameraController
 
         Vector3 offset = player.UseMeleeCamera() ? camera.m_3rdCombatOffset : camera.m_3rdOffset;
         return player.m_eye.TransformVector(Vector3.left * (2f * offset.x * left));
+    }
+
+    /// <summary>
+    /// The head's place with Head Bob applied. The smoothing steps once a frame, as the camera can be placed more
+    /// than once a frame.
+    /// </summary>
+    private static Vector3 SteadiedHead(Player player)
+    {
+        Transform body = player.transform;
+        Vector3 head = body.InverseTransformPoint(player.m_head.position);
+        if (!_hasSteadyHead)
+        {
+            _steadyHead = head;
+            _hasSteadyHead = true;
+        }
+        else if (_steadyHeadFrame != Time.frameCount)
+        {
+            _steadyHead = Vector3.Lerp(_steadyHead, head, 1f - Mathf.Exp(-SteadyHeadRate * Time.deltaTime));
+        }
+
+        _steadyHeadFrame = Time.frameCount;
+        return body.TransformPoint(Vector3.Lerp(_steadyHead, head, FirstPersonSettings.HeadBob));
     }
 
     /// <summary>

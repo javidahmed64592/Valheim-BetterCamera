@@ -11,6 +11,7 @@ internal static class FirstPersonSettings
 {
     private static ConfigEntry<float> _turnAngle;
     private static ConfigEntry<Vector3> _cameraOffset;
+    private static ConfigEntry<float> _headBob;
     private static ConfigEntry<Vector3> _bowAimOffset;
     private static ConfigEntry<float> _maxLookDown;
     private static ConfigEntry<float> _seatedTurnAngle;
@@ -28,6 +29,11 @@ internal static class FirstPersonSettings
     public static float TurnAngle => _turnAngle.Value;
 
     public static Vector3 CameraOffset => _cameraOffset.Value;
+
+    /// <summary>
+    /// How much the camera follows the head's bob, 0 (steady) to 1 (all of it).
+    /// </summary>
+    public static float HeadBob => _headBob.Value;
 
     public static Vector3 BowAimOffset => _bowAimOffset.Value;
 
@@ -61,6 +67,10 @@ internal static class FirstPersonSettings
         _cameraOffset = config.Bind(section, "Camera Offset", new Vector3(0f, 0.1f, 0.12f),
             "Where the first-person camera sits relative to your head's pivot (the top of the neck), in metres " +
             "right, up and forward along where you look. The camera follows the head as the animations move it.");
+        _headBob = config.Bind(section, "Head Bob", 0f,
+            new ConfigDescription("How much the camera bobs and sways with your head as you walk, run and attack. " +
+                "0 (the default) keeps the view steady; 1 follows the head fully.",
+                new AcceptableValueRange<float>(0f, 1f)));
         _bowAimOffset = config.Bind(section, "Bow Aim Offset", new Vector3(0.15f, 0.03f, 0f),
             "Extra camera offset while drawing a bow, in metres right, up and forward, so the bow (held in front " +
             "of your face) sits beside the crosshair instead of covering it. Arrows still fly to the crosshair.");
