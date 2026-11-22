@@ -30,7 +30,8 @@ Zoom in past the closest third-person distance to switch to first person, and zo
 
 ## Field of View
 
-Hold `Alt` and scroll to widen or narrow the view, 5° at a time from 30° to 120° (vanilla 65°). First and third person each keep their own setting, and both are saved in the config under `Field of View`. While a hammer or hoe is out, `Alt+Scroll` does what those tools use it for instead.
+Hold `Alt` and scroll to widen or narrow the view, 5° at a time from 30° to 120° (vanilla 65°).
+First and third person each keep their own setting, and both are saved in the config under `Field of View`.
 
 ![Field of View 60](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/fov_60.png)
 
