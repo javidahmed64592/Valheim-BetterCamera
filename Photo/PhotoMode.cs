@@ -187,7 +187,7 @@ internal static class PhotoMode
         _yaw = angles.y;
         _pitch = Mathf.Clamp(Mathf.DeltaAngle(0f, angles.x), -MaxPitch, MaxPitch);
         _roll = 0f;
-        _fov = camera.m_fov;
+        _fov = CameraController.GameplayFov;
         _speed = _startSpeed.Value;
         _velocity = Vector3.zero;
         _acceleration = Vector3.zero;
@@ -390,7 +390,7 @@ internal static class PhotoMode
         if (ZInput.GetKeyDown(_resetKey.Value))
         {
             _roll = 0f;
-            _fov = camera.m_fov;
+            _fov = CameraController.GameplayFov;
         }
 
         if (ZInput.GetButtonDown("Attack"))

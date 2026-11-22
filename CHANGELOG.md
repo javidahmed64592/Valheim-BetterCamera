@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Set the field of view for third and first person separately (`Field of View`, vanilla 65°).
+- `Head Bob` steadies the first-person camera: lower it if the head's bob and sway while moving and attacking is too much.
+- The shoulder the camera is over is remembered between games.
+
 ## 0.3.0
 
 - Photo mode: press `J` for a free camera to take pictures while your character stands still.
