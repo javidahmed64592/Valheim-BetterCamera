@@ -11,7 +11,7 @@ Play Valheim in first person, take pictures in photo mode, and get more control 
 - **Ship view**: While steering a ship, press `Shift+C` to switch the camera to follow the ship's centre.
 - **Field of view**: `Alt+Scroll` widens or narrows the view, with separate settings for first and third person.
 - **Switch shoulders**: Press `K` to move the third-person camera between your right and left shoulder. Your choice is remembered.
-- **Melee on slopes**: Melee swings tilt up or down with your view, so you can hit enemies above or below you on a hill, in first and third person. Your upper body leans into the swing to match.
+- **Melee on slopes**: Melee swings tilt up or down with your view, so you can hit enemies above or below you on a hill, in first and third person.
 - **Zoom further**: Zoom out up to 16 m while walking, 40 m while steering a ship and 24 m while riding (vanilla 8 m, 16 m on ships). Each has its own limits in the config and remembers its own zoom.
 
 ## First Person
@@ -71,7 +71,6 @@ While steering a ship, press `Shift+C` to switch the camera between following yo
 ## Configuration
 
 Settings are in the BepInEx config file `javidahmed64592.bettercamera.cfg`.
-`Combat` > `Melee Aim Angle` sets how far melee swings tilt with your view (45° by default; 0 keeps vanilla's level swings), and `Lean Into Swings` turns the body lean on or off.
 
 ## Compatibility
 
