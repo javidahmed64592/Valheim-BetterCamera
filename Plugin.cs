@@ -3,6 +3,7 @@ using BepInEx;
 using BetterCamera.Camera;
 using BetterCamera.Core;
 using BetterCamera.FirstPerson;
+using BetterCamera.Photo;
 using BetterCamera.UI;
 
 using HarmonyLib;
@@ -27,6 +28,7 @@ public class BetterCameraPlugin : BaseUnityPlugin
         CameraController.BindConfig(Config);
         ShipHud.BindConfig(Config);
         FirstPersonSettings.BindConfig(Config);
+        PhotoMode.BindConfig(Config);
         Translations.Load();
 
         _harmony = new Harmony(PluginGUID);
@@ -35,6 +37,7 @@ public class BetterCameraPlugin : BaseUnityPlugin
 
     private void OnDestroy()
     {
+        PhotoMode.Exit(Player.m_localPlayer, null);
         _harmony?.UnpatchSelf();
         FirstPersonBody.Restore();
     }
@@ -45,10 +48,12 @@ public class BetterCameraPlugin : BaseUnityPlugin
         Player player = Player.m_localPlayer;
         if (player == null)
         {
+            PhotoMode.Exit(null, null);
             CameraController.Reset();
             return;
         }
 
         CameraController.UpdateInput(player);
+        PhotoMode.UpdateInput(player);
     }
 }

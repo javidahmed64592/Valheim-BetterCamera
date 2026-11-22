@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Photo mode: press `J` for a free camera to take pictures while your character stands still, with key hints for every control. Fly, zoom, roll, look at or follow what's under the crosshair, change gear from the inventory, and hide the UI with `U`. It stays within 100 m of your character and ends if you take damage.
+
 ## 0.2.0
 
 - First person is now made for playing:
