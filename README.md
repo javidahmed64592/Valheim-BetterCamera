@@ -18,7 +18,7 @@ Play Valheim in first person, take pictures in photo mode, and get more control 
 Zoom in past the closest third-person distance to switch to first person, and zoom out to leave it.
 
 - Your body stays visible apart from the head, so you see your arms and gear with the game's own animations.
-- Set a wider field of view for first person with `Alt+Scroll`, and steady the camera with `Head Bob` if the head's movement is too much.
+- Set a wider field of view for first person with `Alt+Scroll`, and raise `Head Bob` if you'd like the camera to bob and sway with your head.
 - Bows, spears, staffs and other ranged attacks fly to the crosshair.
 - Your body turns with your view once you look more than 60° to the side, and always faces where you look while moving.
 - While drawing a bow, the view shifts slightly so the bow doesn't cover the crosshair.

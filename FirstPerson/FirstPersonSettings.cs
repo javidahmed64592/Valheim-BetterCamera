@@ -67,9 +67,9 @@ internal static class FirstPersonSettings
         _cameraOffset = config.Bind(section, "Camera Offset", new Vector3(0f, 0.1f, 0.12f),
             "Where the first-person camera sits relative to your head's pivot (the top of the neck), in metres " +
             "right, up and forward along where you look. The camera follows the head as the animations move it.");
-        _headBob = config.Bind(section, "Head Bob", 1f,
+        _headBob = config.Bind(section, "Head Bob", 0f,
             new ConfigDescription("How much the camera bobs and sways with your head as you walk, run and attack. " +
-                "1 follows the head fully; lower values steady the view, which can help with motion sickness.",
+                "0 (the default) keeps the view steady; 1 follows the head fully.",
                 new AcceptableValueRange<float>(0f, 1f)));
         _bowAimOffset = config.Bind(section, "Bow Aim Offset", new Vector3(0.15f, 0.03f, 0f),
             "Extra camera offset while drawing a bow, in metres right, up and forward, so the bow (held in front " +
