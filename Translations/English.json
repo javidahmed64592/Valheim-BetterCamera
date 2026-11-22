@@ -22,5 +22,8 @@
   "bettercamera_photo_hint_updown": "Up / down",
   "bettercamera_photo_hint_move": "Move",
   "bettercamera_photo_speed": "Speed: $1 m/s",
-  "bettercamera_fov": "Field of view: $1°"
+  "bettercamera_fov": "Field of view: $1°",
+  "bettercamera_photo_hint_hide_character": "Hide character",
+  "bettercamera_photo_hint_show_character": "Show character",
+  "bettercamera_photo_hint_return": "Back to character"
 }

@@ -22,6 +22,7 @@ namespace BetterCamera.Photo;
 /// <item>The hotbar, map and health are always hidden (PhotoHud); the hide UI key hides the rest, through
 /// vanilla's own HUD hiding.</item>
 /// <item>The inventory still opens, so gear can be changed while posing.</item>
+/// <item>Your character can be hidden for scenery shots (PhotoCharacter), and the camera brought back to it.</item>
 /// <item>Screenshots are left to the player (vanilla F11 or their own tool).</item>
 /// </list>
 /// </summary>
@@ -46,6 +47,8 @@ internal static class PhotoMode
     private static ConfigEntry<KeyCode> _rollRightKey;
     private static ConfigEntry<KeyCode> _resetKey;
     private static ConfigEntry<KeyCode> _hideUiKey;
+    private static ConfigEntry<KeyCode> _hideCharacterKey;
+    private static ConfigEntry<KeyCode> _returnKey;
 
     private static bool _active;
     private static float _yaw;
@@ -103,6 +106,10 @@ internal static class PhotoMode
 
     public static KeyCode HideUiKey => _hideUiKey.Value;
 
+    public static KeyCode HideCharacterKey => _hideCharacterKey.Value;
+
+    public static KeyCode ReturnKey => _returnKey.Value;
+
     public static bool LookingAt => _lookAt != null;
 
     public static bool Following => _follow != null;
@@ -119,6 +126,10 @@ internal static class PhotoMode
         _hideUiKey = config.Bind("Keybinds", "Photo Mode Hide UI", KeyCode.U,
             "In photo mode, hides or shows what's left of the UI (key hints, status effects, crosshair and " +
             "messages). The hotbar, map and health are always hidden in photo mode.");
+        _hideCharacterKey = config.Bind("Keybinds", "Photo Mode Hide Character", KeyCode.H,
+            "In photo mode, hides or shows your character, for shots of the scenery.");
+        _returnKey = config.Bind("Keybinds", "Photo Mode Return", KeyCode.C,
+            "In photo mode, brings the camera back to just behind your character, looking at them.");
 
         const string section = "Photo Mode";
         _maxDistance = config.Bind(section, "Max Distance", 100f,
@@ -166,6 +177,14 @@ internal static class PhotoMode
             else if (ZInput.GetKeyDown(_hideUiKey.Value) && Hud.instance != null)
             {
                 Hud.instance.m_userHidden = !Hud.instance.m_userHidden;
+            }
+            else if (ZInput.GetKeyDown(_hideCharacterKey.Value))
+            {
+                PhotoCharacter.Toggle();
+            }
+            else if (ZInput.GetKeyDown(_returnKey.Value))
+            {
+                ReturnToCharacter(player);
             }
         }
         else if (ZInput.GetButtonDown(ButtonQueryName))
@@ -231,6 +250,7 @@ internal static class PhotoMode
         }
 
         PhotoHud.Restore();
+        PhotoCharacter.Reset();
         if (Hud.instance != null)
         {
             Hud.instance.m_userHidden = _hudWasHidden;
@@ -289,6 +309,7 @@ internal static class PhotoMode
         }
 
         PhotoHud.Hide();
+        PhotoCharacter.Apply(Player.m_localPlayer);
 
         // Moving goes where the camera faces (also while it looks at something), without the roll.
         Quaternion look = Quaternion.Euler(0f, _yaw, 0f) * Quaternion.Euler(_pitch, 0f, 0f);
@@ -508,6 +529,39 @@ internal static class PhotoMode
             _followOffset = camera.position - _follow.position;
         }
     }
+
+    /// <summary>
+    /// Puts the camera just behind and above your character, looking at their head, for when it's been flown
+    /// out of sight of them. Stops looking at or following anything.
+    /// </summary>
+    private static void ReturnToCharacter(Player player)
+    {
+        GameCamera camera = GameCamera.instance;
+        if (camera == null || player.m_eye == null)
+        {
+            return;
+        }
+
+        Vector3 head = player.m_eye.position;
+        Vector3 back = Vector3.ProjectOnPlane(player.transform.forward, Vector3.up).normalized;
+        Vector3 position = head - (back * ReturnDistance) + (Vector3.up * ReturnHeight);
+        Vector3 towards = head - position;
+
+        _lookAt = null;
+        _follow = null;
+        _velocity = Vector3.zero;
+        _acceleration = Vector3.zero;
+        _yaw = Quaternion.LookRotation(towards).eulerAngles.y;
+        _pitch = Mathf.Clamp(-Mathf.Atan2(towards.y, new Vector2(towards.x, towards.z).magnitude) * Mathf.Rad2Deg, -MaxPitch, MaxPitch);
+        camera.transform.SetPositionAndRotation(position, Quaternion.Euler(_pitch, _yaw, _roll));
+    }
+
+    /// <summary>
+    /// Where the return key puts the camera: metres behind the character's head, and above it.
+    /// </summary>
+    private const float ReturnDistance = 3f;
+
+    private const float ReturnHeight = 0.5f;
 
     private static Vector3 KeepNearPlayer(Vector3 position)
     {

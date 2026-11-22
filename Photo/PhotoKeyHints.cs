@@ -28,6 +28,8 @@ internal static class PhotoKeyHints
     private const string RollRightKey = "@rollright";
     private const string ResetKey = "@reset";
     private const string HideUiKey = "@hideui";
+    private const string HideCharacterKey = "@hidecharacter";
+    private const string ReturnKey = "@return";
 
     private const float LabelFontSize = 16f;
     private const float IconHeight = 32f;
@@ -57,6 +59,12 @@ internal static class PhotoKeyHints
         new Hint { Keys = [ToggleKey], Label = () => "$bettercamera_photo_hint_exit" },
         new Hint { Keys = ["F11"], Label = () => "$bettercamera_photo_hint_screenshot" },
         new Hint { Keys = [HideUiKey], Label = () => "$bettercamera_photo_hint_hud" },
+        new Hint
+        {
+            Keys = [HideCharacterKey],
+            Label = () => PhotoCharacter.IsHidden ? "$bettercamera_photo_hint_show_character" : "$bettercamera_photo_hint_hide_character",
+        },
+        new Hint { Keys = [ReturnKey], Label = () => "$bettercamera_photo_hint_return" },
         new Hint { Keys = [ResetKey], Label = () => "$bettercamera_photo_hint_reset" },
         new Hint { Keys = [RollLeftKey, RollRightKey], Separator = "/", Label = () => "$bettercamera_photo_hint_roll" },
         new Hint { Keys = ["Left Alt", ScrollIcon], Label = () => "$bettercamera_photo_hint_speed" },
@@ -84,6 +92,7 @@ internal static class PhotoKeyHints
     private static readonly string[] AllLabels =
     [
         "$bettercamera_photo_hint_exit", "$bettercamera_photo_hint_screenshot", "$bettercamera_photo_hint_hud",
+        "$bettercamera_photo_hint_hide_character", "$bettercamera_photo_hint_show_character", "$bettercamera_photo_hint_return",
         "$bettercamera_photo_hint_reset", "$bettercamera_photo_hint_roll", "$bettercamera_photo_hint_speed",
         "$bettercamera_photo_hint_zoom", "$bettercamera_photo_hint_follow", "$bettercamera_photo_hint_unfollow",
         "$bettercamera_photo_hint_look", "$bettercamera_photo_hint_unlook", "$bettercamera_photo_hint_fast",
@@ -252,6 +261,8 @@ internal static class PhotoKeyHints
             RollRightKey => PhotoMode.RollRightKey.ToString(),
             ResetKey => PhotoMode.ResetKey.ToString(),
             HideUiKey => PhotoMode.HideUiKey.ToString(),
+            HideCharacterKey => PhotoMode.HideCharacterKey.ToString(),
+            ReturnKey => PhotoMode.ReturnKey.ToString(),
             _ => Localization.instance.Localize(key),
         };
     }

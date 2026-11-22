@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- In photo mode, press `H` to hide your character for shots of the scenery, and `C` to bring the camera back to just behind them.
+
 ## 0.4.0
 
 - Press `L` to switch between first and third person without zooming all the way in or out.
