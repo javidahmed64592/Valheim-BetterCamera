@@ -26,9 +26,11 @@ internal static class FirstPersonBody
 
     public static void Update(Player player, bool firstPerson)
     {
+        NearFoliage.Update(firstPerson);
         if (!firstPerson || player == null || player.m_visual == null)
         {
-            Restore();
+            RestoreHead();
+            RestoreLights();
             return;
         }
 
@@ -81,6 +83,7 @@ internal static class FirstPersonBody
     {
         RestoreHead();
         RestoreLights();
+        NearFoliage.Restore();
     }
 
     private static void ShrinkHead(Transform head)
