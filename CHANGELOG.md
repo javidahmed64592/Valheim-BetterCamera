@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.2
+
+- Melee swings now tilt up or down with your view, in first and third person, so you can hit enemies above or below you on a hill (`Melee Aim Angle`, 45°; 0 is vanilla). Your upper body leans into the swing to match (`Lean Into Swings`).
+
 ## 0.5.1
 
 - In first person, berry bushes and other plants no longer vanish when you walk right up to them.

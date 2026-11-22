@@ -1,6 +1,7 @@
 using BepInEx;
 
 using BetterCamera.Camera;
+using BetterCamera.Combat;
 using BetterCamera.Core;
 using BetterCamera.FirstPerson;
 using BetterCamera.Photo;
@@ -19,7 +20,7 @@ public class BetterCameraPlugin : BaseUnityPlugin
 {
     public const string PluginGUID = "javidahmed64592.bettercamera";
     public const string PluginName = "Better Camera";
-    public const string PluginVersion = "0.5.1";
+    public const string PluginVersion = "0.5.2";
 
     private Harmony _harmony;
 
@@ -29,6 +30,7 @@ public class BetterCameraPlugin : BaseUnityPlugin
         ShipHud.BindConfig(Config);
         FirstPersonSettings.BindConfig(Config);
         PhotoMode.BindConfig(Config);
+        MeleeAim.BindConfig(Config);
         Translations.Load();
 
         _harmony = new Harmony(PluginGUID);
