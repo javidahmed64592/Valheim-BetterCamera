@@ -1,8 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
-- Photo mode: press `J` for a free camera to take pictures while your character stands still, with key hints for every control. Fly, zoom, roll, look at or follow what's under the crosshair, change gear from the inventory, and hide the UI with `U`. It stays within 100 m of your character and ends if you take damage.
+- Photo mode: press `J` for a free camera to take pictures while your character stands still.
+  - Fly, zoom, roll, and look at or follow what's under the crosshair, with key hints for each control.
+  - The hotbar, map and health are hidden, and `U` hides the rest of the UI.
+  - Open the inventory to change gear while posing.
+  - The camera stays within 100 m of your character, and photo mode ends if you take damage.
 
 ## 0.2.0
 
