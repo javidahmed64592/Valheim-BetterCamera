@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 
 using BepInEx.Configuration;
 
@@ -119,12 +120,13 @@ internal static class CameraController
 
         const string fov = "Field of View";
         _thirdPersonFov = config.Bind(fov, "Third Person", 65f,
-            new ConfigDescription("The camera's field of view in third person, in degrees (vanilla 65).",
-                new AcceptableValueRange<float>(30f, 120f)));
+            new ConfigDescription("The camera's field of view in third person, in degrees (vanilla 65). Alt + " +
+                "scroll changes the one you're in while playing.",
+                new AcceptableValueRange<float>(MinFov, MaxFov)));
         _firstPersonFov = config.Bind(fov, "First Person", 65f,
             new ConfigDescription("The camera's field of view in first person, in degrees (vanilla 65). A wider " +
                 "view can feel less cramped.",
-                new AcceptableValueRange<float>(30f, 120f)));
+                new AcceptableValueRange<float>(MinFov, MaxFov)));
     }
 
     /// <summary>
@@ -207,6 +209,7 @@ internal static class CameraController
     public static void UpdateInput(Player player)
     {
         UpdateShoulderInput(player);
+        UpdateFovInput(player);
         if (!CycleKeyDown(player))
         {
             return;
@@ -221,6 +224,59 @@ internal static class CameraController
         player.Message(MessageHud.MessageType.TopLeft,
             Localization.instance.Localize("$bettercamera_view", Localization.instance.Localize(AnchorToken(next))));
     }
+
+    /// <summary>
+    /// Degrees each Alt+scroll notch changes the field of view by.
+    /// </summary>
+    private const float FovStep = 5f;
+
+    /// <summary>
+    /// True while reading the scroll wheel for the field of view, so the scroll patch lets it through.
+    /// </summary>
+    private static bool _readingFovScroll;
+
+    /// <summary>
+    /// Alt+scroll changes the field of view, and vanilla's zoom doesn't also get the scroll. Only without a build
+    /// tool out (the hammer and hoe use Alt+scroll themselves, in BetterHammer and BetterHoe) and outside photo
+    /// mode (which uses it for speed).
+    /// </summary>
+    internal static bool FovScrollActive(Player player)
+    {
+        return !_readingFovScroll
+            && player != null
+            && (ZInput.GetKey(KeyCode.LeftAlt) || ZInput.GetKey(KeyCode.RightAlt))
+            && !player.InPlaceMode()
+            && !Photo.PhotoMode.Active
+            && !Blocked();
+    }
+
+    /// <summary>
+    /// Alt+scroll: changes the field of view of the view you're in (first or third person) and saves it.
+    /// </summary>
+    private static void UpdateFovInput(Player player)
+    {
+        if (!FovScrollActive(player))
+        {
+            return;
+        }
+
+        _readingFovScroll = true;
+        float scroll = ZInput.GetMouseScrollWheel();
+        _readingFovScroll = false;
+        if (scroll == 0f)
+        {
+            return;
+        }
+
+        ConfigEntry<float> setting = FirstPersonSettings.Active ? _firstPersonFov : _thirdPersonFov;
+        float step = scroll > 0f ? -FovStep : FovStep;
+        setting.Value = Mathf.Clamp(Mathf.Round((setting.Value + step) / FovStep) * FovStep, MinFov, MaxFov);
+        string text = Localization.instance.Localize("$bettercamera_fov", setting.Value.ToString("0", CultureInfo.CurrentCulture));
+        MessageHud.instance?.ShowMessage(MessageHud.MessageType.Center, text, log: false);
+    }
+
+    private const float MinFov = 30f;
+    private const float MaxFov = 120f;
 
     /// <summary>
     /// The shoulder key, in third person only: in first person there's no shoulder to look over.

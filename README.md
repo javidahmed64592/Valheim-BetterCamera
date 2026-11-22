@@ -9,6 +9,7 @@ Play Valheim in first person, take pictures in photo mode, and get more control 
 - **First person**: Zoom all the way in to play through your character's eyes.
 - **Photo mode**: Press `J` for a free camera to take pictures, while your character stands still.
 - **Ship view**: While steering a ship, press `Shift+C` to switch the camera to follow the ship's centre.
+- **Field of view**: `Alt+Scroll` widens or narrows the view, with separate settings for first and third person.
 - **Switch shoulders**: Press `K` to move the third-person camera between your right and left shoulder. Your choice is remembered.
 - **Zoom further**: Zoom out up to 16 m while walking, 40 m while steering a ship and 24 m while riding (vanilla 8 m, 16 m on ships). Each has its own limits in the config and remembers its own zoom.
 
@@ -17,7 +18,7 @@ Play Valheim in first person, take pictures in photo mode, and get more control 
 Zoom in past the closest third-person distance to switch to first person, and zoom out to leave it.
 
 - Your body stays visible apart from the head, so you see your arms and gear with the game's own animations.
-- Set a wider field of view for first person, and steady the camera with `Head Bob` if the head's movement is too much.
+- Set a wider field of view for first person with `Alt+Scroll`, and steady the camera with `Head Bob` if the head's movement is too much.
 - Bows, spears, staffs and other ranged attacks fly to the crosshair.
 - Your body turns with your view once you look more than 60° to the side, and always faces where you look while moving.
 - While drawing a bow, the view shifts slightly so the bow doesn't cover the crosshair.

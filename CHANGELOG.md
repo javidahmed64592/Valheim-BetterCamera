@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Set the field of view for third and first person separately (`Field of View`, vanilla 65°).
+- Set the field of view for third and first person separately with `Alt+Scroll` while playing, or in the config (`Field of View`, vanilla 65°).
 - `Head Bob` steadies the first-person camera: lower it if the head's bob and sway while moving and attacking is too much.
 - The shoulder the camera is over is remembered between games.
 
