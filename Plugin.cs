@@ -19,7 +19,7 @@ public class BetterCameraPlugin : BaseUnityPlugin
 {
     public const string PluginGUID = "javidahmed64592.bettercamera";
     public const string PluginName = "Better Camera";
-    public const string PluginVersion = "0.3.0";
+    public const string PluginVersion = "0.4.0";
 
     private Harmony _harmony;
 

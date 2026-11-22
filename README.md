@@ -6,7 +6,7 @@
 
 Play Valheim in first person, take pictures in photo mode, and get more control over the camera while walking, sailing and riding.
 
-- **First person**: Zoom all the way in to play through your character's eyes.
+- **First person**: Zoom all the way in, or press `L`, to play through your character's eyes.
 - **Photo mode**: Press `J` for a free camera to take pictures, while your character stands still.
 - **Ship view**: While steering a ship, press `Shift+C` to switch the camera to follow the ship's centre.
 - **Field of view**: `Alt+Scroll` widens or narrows the view, with separate settings for first and third person.
@@ -15,10 +15,10 @@ Play Valheim in first person, take pictures in photo mode, and get more control 
 
 ## First Person
 
-Zoom in past the closest third-person distance to switch to first person, and zoom out to leave it.
+Zoom in past the closest third-person distance to switch to first person, and zoom out to leave it. Or press `L` to switch between first and third person, which comes back at the zoom you last had.
 
 - Your body stays visible apart from the head, so you see your arms and gear with the game's own animations.
-- Set a wider field of view for first person with `Alt+Scroll`, and raise `Head Bob` if you'd like the camera to bob and sway with your head.
+- Raise `Head Bob` if you'd like the camera to bob and sway with your head.
 - Bows, spears, staffs and other ranged attacks fly to the crosshair.
 - Your body turns with your view once you look more than 60° to the side, and always faces where you look while moving.
 - While drawing a bow, the view shifts slightly so the bow doesn't cover the crosshair.
@@ -27,6 +27,15 @@ Zoom in past the closest third-person distance to switch to first person, and zo
 ![Walking First Person](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/walking_first_person.png)
 
 ![Sailing First Person](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/sailing_first_person.png)
+
+## Field of View
+
+Hold `Alt` and scroll to widen or narrow the view, 5° at a time from 30° to 120° (vanilla 65°).
+First and third person each keep their own setting, and both are saved in the config under `Field of View`.
+
+![Field of View 60](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/fov_60.png)
+
+![Field of View 90](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/fov_90.png)
 
 ## Photo Mode
 

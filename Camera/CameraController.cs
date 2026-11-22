@@ -29,6 +29,7 @@ namespace BetterCamera.Camera;
 internal static class CameraController
 {
     private const string ShoulderButtonName = "BetterCamera_SwitchShoulder";
+    private const string FirstPersonButtonName = "BetterCamera_FirstPerson";
 
     private sealed class ZoomConfig
     {
@@ -40,6 +41,7 @@ internal static class CameraController
     private static ConfigEntry<bool> _firstPerson;
     private static ConfigEntry<KeyboardShortcut> _cycleKey;
     private static ConfigEntry<KeyCode> _shoulderKey;
+    private static ConfigEntry<KeyCode> _firstPersonKey;
     private static ConfigEntry<float> _shipLift;
     private static ConfigEntry<float> _transitionTime;
     private static ConfigEntry<bool> _leftShoulderSaved;
@@ -91,6 +93,8 @@ internal static class CameraController
 
     private static string ShoulderButtonQueryName => ShoulderButtonName + "!" + BetterCameraPlugin.PluginGUID;
 
+    private static string FirstPersonButtonQueryName => FirstPersonButtonName + "!" + BetterCameraPlugin.PluginGUID;
+
     public static void BindConfig(ConfigFile config)
     {
         Zoom[TravelMode.Walking] = BindZoom(config, "Walking", 1f, 16f, "walking or swimming");
@@ -107,6 +111,10 @@ internal static class CameraController
             "In third person, moves the camera between your right shoulder (vanilla) and your left. " +
             "Rebindable from the in-game controls menu.");
         InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = ShoulderButtonName, Config = _shoulderKey });
+        _firstPersonKey = config.Bind("Keybinds", "First Person", KeyCode.L,
+            "Switches between first person and third person without zooming all the way in or out. Third person " +
+            "comes back at the zoom you last had. Rebindable from the in-game controls menu.");
+        InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = FirstPersonButtonName, Config = _firstPersonKey });
 
         const string views = "Views";
         _shipLift = config.Bind(views, "Ship Height", 4.5f,
@@ -209,6 +217,7 @@ internal static class CameraController
     public static void UpdateInput(Player player)
     {
         UpdateShoulderInput(player);
+        UpdateFirstPersonInput();
         UpdateFovInput(player);
         if (!CycleKeyDown(player))
         {
@@ -281,6 +290,30 @@ internal static class CameraController
     /// <summary>
     /// The shoulder key, in third person only: in first person there's no shoulder to look over.
     /// </summary>
+    /// <summary>
+    /// The first person key: jumps into first person, or back out to the mode's last third-person zoom. Only
+    /// where first person is allowed (around the player, not the ship's centre view).
+    /// </summary>
+    private static void UpdateFirstPersonInput()
+    {
+        GameCamera camera = GameCamera.instance;
+        if (camera == null || camera.m_freeFly || !_firstPerson.Value || Anchor != ViewAnchor.Player || !_modeKnown
+            || Blocked() || !ZInput.GetButtonDown(FirstPersonButtonQueryName))
+        {
+            return;
+        }
+
+        if (camera.m_distance <= 0f)
+        {
+            camera.m_distance = ThirdPersonDistance(_mode, Min(_mode));
+        }
+        else
+        {
+            Distances[_mode] = camera.m_distance;
+            camera.m_distance = 0f;
+        }
+    }
+
     private static void UpdateShoulderInput(Player player)
     {
         GameCamera camera = GameCamera.instance;
