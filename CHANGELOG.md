@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.0
 
 - In photo mode, press `H` to hide your character for shots of the scenery, and `C` to bring the camera back to just behind them.
 
