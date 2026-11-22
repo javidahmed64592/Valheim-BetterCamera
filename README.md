@@ -54,6 +54,8 @@ Press `J` to fly a free camera around your character (up to 100 m away) and line
 | `Middle-Click` | Move along with what's under the crosshair, such as a ship or a creature. |
 | `Tab`          | Open the inventory to change your gear.                    |
 | `U`            | Hide or show the rest of the UI.                           |
+| `H`            | Hide or show your character, for shots of the scenery.     |
+| `C`            | Bring the camera back to just behind your character.       |
 | `F11`          | Take a screenshot (vanilla, saved in Valheim's `screenshots` folder). |
 | `J`            | Leave photo mode.                                          |
 
