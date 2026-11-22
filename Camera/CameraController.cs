@@ -3,6 +3,7 @@ using System.Globalization;
 
 using BepInEx.Configuration;
 
+using BetterCamera.Combat;
 using BetterCamera.Core;
 using BetterCamera.FirstPerson;
 
@@ -565,7 +566,8 @@ internal static class CameraController
     private static Vector3 SteadiedHead(Player player)
     {
         Transform body = player.transform;
-        Vector3 head = body.InverseTransformPoint(player.m_head.position);
+        // The unbent head, so leaning into a melee swing doesn't move the view.
+        Vector3 head = body.InverseTransformPoint(MeleeLean.HeadPosition(player));
         if (!_hasSteadyHead)
         {
             _steadyHead = head;
