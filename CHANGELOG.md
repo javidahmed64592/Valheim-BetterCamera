@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
 
-- Set the field of view for third and first person separately with `Alt+Scroll` while playing, or in the config (`Field of View`, vanilla 65°).
-- The first-person camera is now steady while walking, running and attacking. Raise `Head Bob` (0 to 1) to have it bob and sway with your head as before.
+- Press `L` to switch between first and third person without zooming all the way in or out.
+- Change the field of view with `Alt+Scroll`, separately for first and third person (`Field of View`, vanilla 65°).
+- The first-person camera is now steady while moving and attacking. Raise `Head Bob` to have it bob and sway with your head as before.
 - The shoulder the camera is over is remembered between games.
 
 ## 0.3.0
