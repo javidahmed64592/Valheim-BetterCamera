@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.3
+
+- In first person, your shadow now has its head (and helmet, hair and beard).
+- Fixed putting on a helmet in first person: it no longer shows up when you swing, and isn't huge (and breaks the lighting) when you go back to third person.
+
 ## 0.5.2
 
 - Melee swings now tilt up or down with your view, in first and third person, so you can hit enemies above or below you on a hill (`Melee Aim Angle`, 45°; 0 is vanilla). Your upper body leans into the swing to match (`Lean Into Swings`).
