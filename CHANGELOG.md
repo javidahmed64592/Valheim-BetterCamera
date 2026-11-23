@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.3
 
 - In first person, your shadow now has its head (and helmet, hair and beard).
 - Fixed putting on a helmet in first person: it no longer shows up when you swing, and isn't huge (and breaks the lighting) when you go back to third person.
