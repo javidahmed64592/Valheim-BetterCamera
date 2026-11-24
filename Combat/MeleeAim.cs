@@ -1,5 +1,7 @@
 using BepInEx.Configuration;
 
+using BetterCamera.FirstPerson;
+
 using UnityEngine;
 
 namespace BetterCamera.Combat;
@@ -36,22 +38,50 @@ internal static class MeleeAim
     }
 
     /// <summary>
-    /// Vanilla's melee direction, built the same way but with the larger of the attack's own angle and ours.
+    /// Vanilla's melee direction, built the same way but with the larger of the attack's own angle and ours. In
+    /// first person the swing is aimed at the crosshair instead (see <see cref="FirstPersonDirection"/>).
     /// </summary>
     public static Vector3 Direction(Attack attack, Transform originJoint, Vector3 vanilla)
     {
         float maxAngle = Mathf.Max(attack.m_maxYAngle, MaxAngle);
+        if (FirstPersonSettings.Active && attack.m_character is Player player)
+        {
+            return FirstPersonDirection(attack, player, originJoint, maxAngle);
+        }
+
         if (maxAngle <= attack.m_maxYAngle)
         {
             return vanilla;
         }
 
-        // In first person GetAimDir already points at what the crosshair is on (see CrosshairAim).
         Vector3 forward = attack.m_character.transform.forward;
         Vector3 aim = attack.m_character.GetAimDir(originJoint.position);
         aim.x = forward.x;
         aim.z = forward.z;
         aim.Normalize();
         return Vector3.RotateTowards(forward, aim, Mathf.Deg2Rad * maxAngle, 10f);
+    }
+
+    /// <summary>
+    /// The swing starts at the attack's height above the origin (chest height, well below the eyes), so a swing
+    /// parallel to the view, or aimed from the origin, passes below or beside the crosshair. This tilts it so it
+    /// goes from where it starts through the crosshair, at what the crosshair is on or a point on the crosshair line
+    /// just past the swing's reach. It still sweeps where the body faces, and tilts at most `maxAngle`.
+    /// </summary>
+    private static Vector3 FirstPersonDirection(Attack attack, Player player, Transform originJoint, float maxAngle)
+    {
+        Vector3 forward = player.transform.forward;
+        Vector3 start = originJoint.position + (Vector3.up * attack.m_attackHeight)
+            + (player.transform.right * attack.m_attackOffset);
+        if (!CrosshairAim.TryGetTarget(player, attack.m_attackRange + 1f, out Vector3 target))
+        {
+            return forward;
+        }
+
+        Vector3 toTarget = target - start;
+        float level = Vector3.ProjectOnPlane(toTarget, Vector3.up).magnitude;
+        float pitch = Mathf.Atan2(toTarget.y, Mathf.Max(level, 0.1f)) * Mathf.Rad2Deg;
+        pitch = Mathf.Clamp(pitch, -maxAngle, maxAngle);
+        return Quaternion.AngleAxis(-pitch, player.transform.right) * forward;
     }
 }

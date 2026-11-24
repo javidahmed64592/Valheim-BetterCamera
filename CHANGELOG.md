@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- The first-person camera sits higher, nearer eye level, (`Camera Height` 0.3, up from 0.1; `Camera Forward` 0.08, from 0.12), so your character no longer feels short.
+- Settings that were a position or offset (`Camera Offset`, `Bow Aim Offset`, the ship HUD's `Fixed Position`) are now one number per direction, which are easier to edit. If you changed any of them, set them again under their new names.
+- In first person, looking down no longer drops the camera to your shoulders, so your body and arms look the right size and you can't see into your shoulders when you look at them (`Head Nod`, 0.25; 1 is the old behaviour).
+- In first person, melee swings now go through the crosshair; before, they landed a little below it.
+- Fixed your character's animations freezing in first person inside crypts and other dark places.
+
 ## 0.5.3
 
 - In first person, your shadow now has its head (and helmet, hair and beard).

@@ -531,8 +531,28 @@ internal static class CameraController
         // Ease the bow offset in and out over about 0.15 s.
         float target = player.IsDrawingBow() ? 1f : 0f;
         _bowAim = Mathf.MoveTowards(_bowAim, target, Time.deltaTime / 0.15f);
-        Vector3 offset = FirstPersonSettings.CameraOffset + (FirstPersonSettings.BowAimOffset * Mathf.SmoothStep(0f, 1f, _bowAim));
-        return SteadiedHead(player) + (player.m_eye.rotation * offset);
+        Vector3 bowOffset = FirstPersonSettings.BowAimOffset * Mathf.SmoothStep(0f, 1f, _bowAim);
+        return SteadiedHead(player) + (NoddedHead(player.m_eye.rotation) * FirstPersonSettings.CameraOffset)
+            + (player.m_eye.rotation * bowOffset);
+    }
+
+    /// <summary>
+    /// The camera offset turns fully with the view sideways, but only follows part of its pitch (Head Nod). The
+    /// head pivot is at the top of the neck, so turning the whole offset down with a 65° look dropped the eyes to
+    /// shoulder height and pushed them forward, which made the body look huge and let the view clip into the
+    /// shoulders when turning to look at them. The rest of the pitch is the eyes looking down.
+    /// </summary>
+    private static Quaternion NoddedHead(Quaternion look)
+    {
+        Vector3 forward = look * Vector3.forward;
+        Vector3 level = Vector3.ProjectOnPlane(forward, Vector3.up);
+        if (level.sqrMagnitude < 0.0001f)
+        {
+            return look;
+        }
+
+        float pitch = Vector3.SignedAngle(level, forward, Vector3.Cross(Vector3.up, level));
+        return Quaternion.LookRotation(level) * Quaternion.Euler(pitch * FirstPersonSettings.HeadNod, 0f, 0f);
     }
 
     /// <summary>
