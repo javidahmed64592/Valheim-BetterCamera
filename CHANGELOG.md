@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.5.4
 
 - The first-person camera sits higher, nearer eye level, (`Camera Height` 0.3, up from 0.1; `Camera Forward` 0.08, from 0.12), so your character no longer feels short.
 - Settings that were a position or offset (`Camera Offset`, `Bow Aim Offset`, the ship HUD's `Fixed Position`) are now one number per direction, which are easier to edit. If you changed any of them, set them again under their new names.
