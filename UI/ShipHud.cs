@@ -11,15 +11,21 @@ namespace BetterCamera.UI;
 /// </summary>
 internal static class ShipHud
 {
-    private static ConfigEntry<Vector2> _position;
+    private static ConfigEntry<float> _positionX;
+    private static ConfigEntry<float> _positionY;
     private static ConfigEntry<bool> _alwaysFixed;
 
     public static void BindConfig(ConfigFile config)
     {
         const string section = "Ship Controls";
-        _position = config.Bind(section, "Fixed Position", new Vector2(0.5f, 0.25f),
-            "Where on the screen the sail and rudder indicator goes in first person, as fractions of the screen's " +
-            "width and height from the bottom left (0.5, 0.25 is the middle, a quarter of the way up).");
+        _positionX = config.Bind(section, "Fixed Position Across", 0.5f,
+            new ConfigDescription("Where across the screen the sail and rudder indicator goes in first person, as a " +
+                "fraction of the screen's width from the left (0.5 is the middle).",
+                new AcceptableValueRange<float>(0f, 1f)));
+        _positionY = config.Bind(section, "Fixed Position Up", 0.25f,
+            new ConfigDescription("Where up the screen the sail and rudder indicator goes in first person, as a " +
+                "fraction of the screen's height from the bottom (0.25 is a quarter of the way up).",
+                new AcceptableValueRange<float>(0f, 1f)));
         _alwaysFixed = config.Bind(section, "Always Fixed", false,
             "Keep the sail and rudder indicator at the fixed position in third person too, instead of beside the helm.");
     }
@@ -41,8 +47,7 @@ internal static class ShipHud
             return;
         }
 
-        Vector2 position = _position.Value;
         hud.m_shipControlsRoot.transform.position = new Vector3(
-            Screen.width * Mathf.Clamp01(position.x), Screen.height * Mathf.Clamp01(position.y), 0f);
+            Screen.width * Mathf.Clamp01(_positionX.Value), Screen.height * Mathf.Clamp01(_positionY.Value), 0f);
     }
 }

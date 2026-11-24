@@ -32,18 +32,34 @@ internal static class CrosshairAim
     /// </summary>
     public static Vector3 DirectionFrom(Player player, Vector3 from, Vector3 fallback)
     {
-        UnityEngine.Camera camera = Utils.GetMainCamera();
-        if (camera == null)
+        if (!TryGetTarget(player, MaxDistance, out Vector3 target))
         {
             return fallback;
         }
 
+        Vector3 direction = target - from;
+        return direction.sqrMagnitude > 0.01f ? direction.normalized : fallback;
+    }
+
+    /// <summary>
+    /// The point the crosshair is on, or the point `maxDistance` along the view when nothing is nearer. Either way
+    /// it's on the line through the crosshair.
+    /// </summary>
+    public static bool TryGetTarget(Player player, float maxDistance, out Vector3 target)
+    {
+        UnityEngine.Camera camera = Utils.GetMainCamera();
+        if (camera == null)
+        {
+            target = Vector3.zero;
+            return false;
+        }
+
         Vector3 origin = camera.transform.position;
         Vector3 forward = camera.transform.forward;
-        Vector3 target = origin + (forward * MaxDistance);
+        target = origin + (forward * maxDistance);
 
-        int count = Physics.RaycastNonAlloc(origin, forward, Hits, MaxDistance, Mask, QueryTriggerInteraction.Ignore);
-        float nearest = MaxDistance;
+        int count = Physics.RaycastNonAlloc(origin, forward, Hits, maxDistance, Mask, QueryTriggerInteraction.Ignore);
+        float nearest = maxDistance;
         for (int i = 0; i < count; i++)
         {
             RaycastHit hit = Hits[i];
@@ -54,8 +70,7 @@ internal static class CrosshairAim
             }
         }
 
-        Vector3 direction = target - from;
-        return direction.sqrMagnitude > 0.01f ? direction.normalized : fallback;
+        return true;
     }
 
     /// <summary>

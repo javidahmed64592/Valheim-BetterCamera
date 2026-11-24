@@ -55,6 +55,8 @@ internal static class FirstPersonBody
     private static MaterialPropertyBlock _block;
 
     private static Player _player;
+    private static Animator _animator;
+    private static AnimatorCullingMode _animatorCulling;
     private static bool _applied;
     private static bool _dirty;
 
@@ -118,6 +120,8 @@ internal static class FirstPersonBody
             return;
         }
 
+        KeepAnimating(player);
+
         VisEquipment equipment = player.m_visEquipment;
         player.m_visual.GetComponentsInChildren(includeInactive: true, Renderers);
         foreach (Renderer renderer in Renderers)
@@ -142,6 +146,21 @@ internal static class FirstPersonBody
         }
 
         Renderers.Clear();
+    }
+
+    /// <summary>
+    /// Keeps the body animating while every renderer under its Animator only casts shadows. The visible copies sit
+    /// outside the Animator, so with no shadow-casting light (inside crypts and caves) Unity sees nothing of the
+    /// body on screen and its culling stops the animations.
+    /// </summary>
+    private static void KeepAnimating(Player player)
+    {
+        _animator = player.m_visual.GetComponent<Animator>();
+        if (_animator != null)
+        {
+            _animatorCulling = _animator.cullingMode;
+            _animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+        }
     }
 
     /// <summary>
@@ -389,6 +408,13 @@ internal static class FirstPersonBody
         }
 
         Copies.Clear();
+
+        if (_animator != null)
+        {
+            _animator.cullingMode = _animatorCulling;
+        }
+
+        _animator = null;
         _applied = false;
         _dirty = false;
         _player = null;
