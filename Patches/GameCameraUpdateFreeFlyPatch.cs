@@ -1,3 +1,4 @@
+using BetterCamera.Core;
 using BetterCamera.Photo;
 
 using HarmonyLib;
@@ -9,6 +10,7 @@ namespace BetterCamera.Patches;
 /// own still uses vanilla's.
 /// </summary>
 [HarmonyPatch(typeof(GameCamera), "UpdateFreeFly")]
+[Feature(PhotoMode.Feature)]
 internal static class GameCamera_UpdateFreeFly_Patch
 {
     [HarmonyPrefix]

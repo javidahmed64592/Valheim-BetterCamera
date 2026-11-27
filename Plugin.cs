@@ -34,7 +34,7 @@ public class BetterCameraPlugin : BaseUnityPlugin
         Translations.Load();
 
         _harmony = new Harmony(PluginGUID);
-        _harmony.PatchAll();
+        _ = SafePatcher.PatchAll(_harmony, Config, Logger);
     }
 
     private void OnDestroy()
@@ -47,6 +47,11 @@ public class BetterCameraPlugin : BaseUnityPlugin
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822", Justification = "Unity message")]
     private void Update()
     {
+        if (!SafePatcher.ModEnabled)
+        {
+            return;
+        }
+
         Player player = Player.m_localPlayer;
         if (player == null)
         {

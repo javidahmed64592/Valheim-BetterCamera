@@ -3,6 +3,7 @@ using System.Globalization;
 using BepInEx.Configuration;
 
 using BetterCamera.Camera;
+using BetterCamera.Core;
 
 using Jotunn.Configs;
 using Jotunn.Managers;
@@ -28,6 +29,12 @@ namespace BetterCamera.Photo;
 /// </summary>
 internal static class PhotoMode
 {
+    /// <summary>
+    /// Photo mode's patches: its flight controls, screenshot key, crosshair, inventory, key hints and ending on damage.
+    /// Without it, the photo mode key does nothing, and photo mode ends if it was on.
+    /// </summary>
+    public const string Feature = "Photo mode";
+
     private const string ButtonName = "BetterCamera_PhotoMode";
 
     private const float FovStep = 1.1f;
@@ -155,6 +162,12 @@ internal static class PhotoMode
     /// </summary>
     public static void UpdateInput(Player player)
     {
+        if (!SafePatcher.IsOn(Feature))
+        {
+            Exit(player, null);
+            return;
+        }
+
         if (Active && (player.IsDead() || (_exitOnDamage.Value && _damaged)))
         {
             Exit(player, "$bettercamera_photo_damage");

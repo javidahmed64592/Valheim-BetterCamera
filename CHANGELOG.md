@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- If a game update breaks part of the mod, only that part turns off and the rest keeps working: photo mode, the ship view, aiming melee and ranged attacks with your view, the body turning with your view, the look-down limit, the close clipping plane, the first-person ship indicator and Alt+scroll not zooming can each turn off while first person and the field of view still work. The log says which part is off, in one line. If the camera itself breaks, the whole mod turns off cleanly instead of throwing errors.
+- New `DisabledFeatures` setting under `[Debug]`, for testing: turns parts of the mod off by name.
+- Updated Jotunn to 2.30.3.
+
 ## 0.5.4
 
 - The first-person camera sits higher, nearer eye level, (`Camera Height` 0.3, up from 0.1; `Camera Forward` 0.08, from 0.12), so your character no longer feels short.

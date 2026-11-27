@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 
 using BetterCamera.Camera;
+using BetterCamera.Core;
 
 using HarmonyLib;
 
@@ -12,6 +13,7 @@ namespace BetterCamera.Patches;
 /// toggle walking.
 /// </summary>
 [HarmonyPatch(typeof(ZInput), nameof(ZInput.Update))]
+[Feature(CameraController.ShipViewFeature)]
 internal static class ZInput_Update_Patch
 {
     private const string ToggleWalk = "ToggleWalk";

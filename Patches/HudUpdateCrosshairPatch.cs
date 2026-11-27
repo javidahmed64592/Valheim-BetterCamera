@@ -1,3 +1,4 @@
+using BetterCamera.Core;
 using BetterCamera.Photo;
 
 using HarmonyLib;
@@ -9,6 +10,7 @@ namespace BetterCamera.Patches;
 /// yellow crosshair or piece health bar.
 /// </summary>
 [HarmonyPatch(typeof(Hud), "UpdateCrosshair")]
+[Feature(PhotoMode.Feature)]
 internal static class Hud_UpdateCrosshair_Patch
 {
     [HarmonyPostfix]

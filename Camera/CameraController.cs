@@ -29,6 +29,11 @@ namespace BetterCamera.Camera;
 /// </summary>
 internal static class CameraController
 {
+    /// <summary>
+    /// The ship view's patches. Without it, the ship view key does nothing and the camera always follows the player.
+    /// </summary>
+    public const string ShipViewFeature = "Ship view";
+
     private const string ShoulderButtonName = "BetterCamera_SwitchShoulder";
     private const string FirstPersonButtonName = "BetterCamera_FirstPerson";
 
@@ -193,7 +198,7 @@ internal static class CameraController
         get
         {
             bool chosen = Anchors.TryGetValue(_mode, out ViewAnchor anchor);
-            return _mode != TravelMode.Walking && chosen ? anchor : ViewAnchor.Player;
+            return _mode != TravelMode.Walking && chosen && SafePatcher.IsOn(ShipViewFeature) ? anchor : ViewAnchor.Player;
         }
     }
 
@@ -337,7 +342,7 @@ internal static class CameraController
     /// </summary>
     internal static bool CycleKeyDown(Player player)
     {
-        return Steering(player) && !Blocked() && KeyInput.IsDown(_cycleKey.Value);
+        return SafePatcher.IsOn(ShipViewFeature) && Steering(player) && !Blocked() && KeyInput.IsDown(_cycleKey.Value);
     }
 
     private static string AnchorToken(ViewAnchor anchor)

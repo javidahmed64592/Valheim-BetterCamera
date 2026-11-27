@@ -13,6 +13,12 @@ namespace BetterCamera.Combat;
 /// </summary>
 internal static class MeleeAim
 {
+    /// <summary>
+    /// Tilting melee swings with the view and leaning the upper body into them. Without it, swings stay level as in
+    /// vanilla.
+    /// </summary>
+    public const string Feature = "Melee aim with view";
+
     private static ConfigEntry<float> _maxAngle;
     private static ConfigEntry<bool> _leanIntoSwings;
 

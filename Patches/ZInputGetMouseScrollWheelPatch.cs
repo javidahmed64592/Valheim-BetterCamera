@@ -1,4 +1,5 @@
 using BetterCamera.Camera;
+using BetterCamera.Core;
 
 using HarmonyLib;
 
@@ -9,8 +10,12 @@ namespace BetterCamera.Patches;
 /// doesn't also get it. The field of view handler reads it itself while this lets it through.
 /// </summary>
 [HarmonyPatch(typeof(ZInput), nameof(ZInput.GetMouseScrollWheel))]
+[Feature(Feature)]
 internal static class ZInput_GetMouseScrollWheel_Patch
 {
+    /// <summary>Without it, Alt+scroll still changes the field of view but also zooms the camera.</summary>
+    public const string Feature = "Alt+scroll doesn't zoom";
+
     [HarmonyPostfix]
     private static void Postfix(ref float __result)
     {

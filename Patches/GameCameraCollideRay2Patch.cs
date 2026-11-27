@@ -1,4 +1,5 @@
 using BetterCamera.Camera;
+using BetterCamera.Core;
 
 using HarmonyLib;
 
@@ -11,6 +12,7 @@ namespace BetterCamera.Patches;
 /// ship's centre instead, that check would pull the camera in for no reason, so only the pivot's own check is kept.
 /// </summary>
 [HarmonyPatch(typeof(GameCamera), "CollideRay2")]
+[Feature(CameraController.ShipViewFeature)]
 internal static class GameCamera_CollideRay2_Patch
 {
     [HarmonyPrefix]

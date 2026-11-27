@@ -1,3 +1,4 @@
+using BetterCamera.Core;
 using BetterCamera.FirstPerson;
 
 using HarmonyLib;
@@ -13,8 +14,12 @@ namespace BetterCamera.Patches;
 /// blocking, building) still apply.
 /// </summary>
 [HarmonyPatch(typeof(Player), "AlwaysRotateCamera")]
+[Feature(Feature)]
 internal static class Player_AlwaysRotateCamera_Patch
 {
+    /// <summary>Without it, the body turns as in vanilla, so in first person you can look sideways into your own shoulder.</summary>
+    public const string Feature = "Body turns with view";
+
     [HarmonyPostfix]
     private static void Postfix(Player __instance, ref bool __result)
     {
