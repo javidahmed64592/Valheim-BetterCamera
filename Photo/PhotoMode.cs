@@ -43,20 +43,11 @@ internal static class PhotoMode
     private const float MaxSpeed = 100f;
     private const float RollSpeed = 45f;
     private const float MaxPitch = 89f;
-
-    private static ConfigEntry<KeyCode> _toggleKey;
     private static ConfigEntry<float> _maxDistance;
     private static ConfigEntry<float> _startSpeed;
     private static ConfigEntry<float> _fastMultiplier;
     private static ConfigEntry<float> _smoothing;
     private static ConfigEntry<bool> _exitOnDamage;
-    private static ConfigEntry<KeyCode> _rollLeftKey;
-    private static ConfigEntry<KeyCode> _rollRightKey;
-    private static ConfigEntry<KeyCode> _resetKey;
-    private static ConfigEntry<KeyCode> _hideUiKey;
-    private static ConfigEntry<KeyCode> _hideCharacterKey;
-    private static ConfigEntry<KeyCode> _returnKey;
-
     private static bool _active;
     private static float _yaw;
     private static float _pitch;
@@ -103,19 +94,19 @@ internal static class PhotoMode
         }
     }
 
-    public static KeyCode ToggleKey => _toggleKey.Value;
+    public static KeyBinding ToggleKey { get; private set; }
 
-    public static KeyCode RollLeftKey => _rollLeftKey.Value;
+    public static KeyBinding RollLeftKey { get; private set; }
 
-    public static KeyCode RollRightKey => _rollRightKey.Value;
+    public static KeyBinding RollRightKey { get; private set; }
 
-    public static KeyCode ResetKey => _resetKey.Value;
+    public static KeyBinding ResetKey { get; private set; }
 
-    public static KeyCode HideUiKey => _hideUiKey.Value;
+    public static KeyBinding HideUiKey { get; private set; }
 
-    public static KeyCode HideCharacterKey => _hideCharacterKey.Value;
+    public static KeyBinding HideCharacterKey { get; private set; }
 
-    public static KeyCode ReturnKey => _returnKey.Value;
+    public static KeyBinding ReturnKey { get; private set; }
 
     public static bool LookingAt => _lookAt != null;
 
@@ -123,19 +114,19 @@ internal static class PhotoMode
 
     public static void BindConfig(ConfigFile config)
     {
-        _toggleKey = config.Bind("Keybinds", "Photo Mode", KeyCode.J,
+        ToggleKey = KeyBinding.Bind(config, "Keybinds", "Photo Mode", KeyCode.J, KeyModifier.None,
             "Turns photo mode on and off: a free camera for taking pictures while your character stands still. " +
             "Rebindable from the in-game controls menu.");
-        InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = ButtonName, Config = _toggleKey });
-        _rollLeftKey = config.Bind("Keybinds", "Photo Mode Roll Left", KeyCode.Q, "In photo mode, tilts the camera to the left.");
-        _rollRightKey = config.Bind("Keybinds", "Photo Mode Roll Right", KeyCode.E, "In photo mode, tilts the camera to the right.");
-        _resetKey = config.Bind("Keybinds", "Photo Mode Reset", KeyCode.R, "In photo mode, levels the camera and resets the zoom.");
-        _hideUiKey = config.Bind("Keybinds", "Photo Mode Hide UI", KeyCode.U,
+        InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = ButtonName, Config = ToggleKey.KeyEntry });
+        RollLeftKey = KeyBinding.Bind(config, "Keybinds", "Photo Mode Roll Left", KeyCode.Q, KeyModifier.None, "In photo mode, tilts the camera to the left.");
+        RollRightKey = KeyBinding.Bind(config, "Keybinds", "Photo Mode Roll Right", KeyCode.E, KeyModifier.None, "In photo mode, tilts the camera to the right.");
+        ResetKey = KeyBinding.Bind(config, "Keybinds", "Photo Mode Reset", KeyCode.R, KeyModifier.None, "In photo mode, levels the camera and resets the zoom.");
+        HideUiKey = KeyBinding.Bind(config, "Keybinds", "Photo Mode Hide UI", KeyCode.U, KeyModifier.None,
             "In photo mode, hides or shows what's left of the UI (key hints, status effects, crosshair and " +
             "messages). The hotbar, map and health are always hidden in photo mode.");
-        _hideCharacterKey = config.Bind("Keybinds", "Photo Mode Hide Character", KeyCode.H,
+        HideCharacterKey = KeyBinding.Bind(config, "Keybinds", "Photo Mode Hide Character", KeyCode.H, KeyModifier.None,
             "In photo mode, hides or shows your character, for shots of the scenery.");
-        _returnKey = config.Bind("Keybinds", "Photo Mode Return", KeyCode.C,
+        ReturnKey = KeyBinding.Bind(config, "Keybinds", "Photo Mode Return", KeyCode.C, KeyModifier.None,
             "In photo mode, brings the camera back to just behind your character, looking at them.");
 
         const string section = "Photo Mode";
@@ -183,24 +174,24 @@ internal static class PhotoMode
         // photo mode the keys are read directly.
         if (Active)
         {
-            if (ZInput.GetKeyDown(_toggleKey.Value))
+            if (ToggleKey.IsDown())
             {
                 Exit(player, "$bettercamera_photo_off");
             }
-            else if (ZInput.GetKeyDown(_hideUiKey.Value) && Hud.instance != null)
+            else if (HideUiKey.IsDown() && Hud.instance != null)
             {
                 Hud.instance.m_userHidden = !Hud.instance.m_userHidden;
             }
-            else if (ZInput.GetKeyDown(_hideCharacterKey.Value))
+            else if (HideCharacterKey.IsDown())
             {
                 PhotoCharacter.Toggle();
             }
-            else if (ZInput.GetKeyDown(_returnKey.Value))
+            else if (ReturnKey.IsDown())
             {
                 ReturnToCharacter(player);
             }
         }
-        else if (ZInput.GetButtonDown(ButtonQueryName))
+        else if (ZInput.GetButtonDown(ButtonQueryName) && ToggleKey.Accepts())
         {
             Enter(player);
         }
@@ -411,17 +402,17 @@ internal static class PhotoMode
             }
         }
 
-        if (ZInput.GetKey(_rollLeftKey.Value))
+        if (RollLeftKey.IsHeld())
         {
             _roll += RollSpeed * dt;
         }
 
-        if (ZInput.GetKey(_rollRightKey.Value))
+        if (RollRightKey.IsHeld())
         {
             _roll -= RollSpeed * dt;
         }
 
-        if (ZInput.GetKeyDown(_resetKey.Value))
+        if (ResetKey.IsDown())
         {
             _roll = 0f;
             _fov = CameraController.GameplayFov;

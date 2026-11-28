@@ -24,6 +24,7 @@ Zoom in past the closest third-person distance to switch to first person, and zo
 - Your body turns with your view once you look more than 60° to the side, and always faces where you look while moving.
 - While drawing a bow, the view shifts slightly so the bow doesn't cover the crosshair.
 - While sailing, the ship's sail and rudder indicator sits at a fixed spot in front of you.
+- What you say in chat shows at the top centre of the screen, slightly bigger and in bold, instead of jumping between the screen edges.
 
 ![Walking First Person](https://github.com/javidahmed64592/Valheim-BetterCamera/raw/main/images/walking_first_person.png)
 
@@ -71,6 +72,7 @@ While steering a ship, press `Shift+C` to switch the camera between following yo
 ## Configuration
 
 Settings are in the BepInEx config file `javidahmed64592.bettercamera.cfg`.
+Each keybind has a key and a `Modifier` (`None`, `Shift`, `Ctrl` or `Alt`), both picked from a list, so combos like Shift + B can be bound.
 `DisabledFeatures` under `[Debug]` is for testing: it turns parts of the mod off by name. Leave it empty to play normally.
 
 ## Compatibility

@@ -4,6 +4,9 @@
 
 - If a game update breaks part of the mod, only that part turns off and the rest keeps working: photo mode, the ship view, aiming melee and ranged attacks with your view, the body turning with your view, the look-down limit, the close clipping plane, the first-person ship indicator and Alt+scroll not zooming can each turn off while first person and the field of view still work. The log says which part is off, in one line. If the camera itself breaks, the whole mod turns off cleanly instead of throwing errors.
 - New `DisabledFeatures` setting under `[Debug]`, for testing: turns parts of the mod off by name.
+- In first person, what you say in chat shows at the top centre of the screen, a little bigger and in bold, instead of jumping between the left and right edges. It moves down below a raid name or boss health bar when one is showing. It can turn off on its own after a game update ("Own chat at top in first person").
+- Every keybind is now a key plus an optional modifier (`None`, `Shift`, `Ctrl` or `Alt`), both picked from a list in the config, so combos like Shift + B can be bound without typing them. Settings saved by an older version carry over.
+- With `debugmode` on, this mod's key combos no longer also do what their key does in debug mode, such as Ctrl+Z also toggling flying. A key on its own still does both.
 - Updated Jotunn to 2.30.3.
 
 ## 0.5.4
