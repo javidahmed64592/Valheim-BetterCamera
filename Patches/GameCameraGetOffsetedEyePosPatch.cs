@@ -1,4 +1,5 @@
 using BetterCamera.Camera;
+using BetterCamera.Core;
 
 using HarmonyLib;
 
@@ -10,6 +11,7 @@ namespace BetterCamera.Patches;
 /// Moves the point the camera orbits to the ship's centre while that view is on.
 /// </summary>
 [HarmonyPatch(typeof(GameCamera), "GetOffsetedEyePos")]
+[Feature(CameraController.ShipViewFeature)]
 internal static class GameCamera_GetOffsetedEyePos_Patch
 {
     [HarmonyPostfix]

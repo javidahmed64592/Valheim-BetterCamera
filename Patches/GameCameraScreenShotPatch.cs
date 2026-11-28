@@ -1,3 +1,4 @@
+using BetterCamera.Core;
 using BetterCamera.Photo;
 
 using HarmonyLib;
@@ -11,6 +12,7 @@ namespace BetterCamera.Patches;
 /// doesn't fill the screenshots folder.
 /// </summary>
 [HarmonyPatch(typeof(GameCamera), nameof(GameCamera.ScreenShot))]
+[Feature(PhotoMode.Feature)]
 internal static class GameCamera_ScreenShot_Patch
 {
     [HarmonyPrefix]

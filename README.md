@@ -71,10 +71,12 @@ While steering a ship, press `Shift+C` to switch the camera between following yo
 ## Configuration
 
 Settings are in the BepInEx config file `javidahmed64592.bettercamera.cfg`.
+`DisabledFeatures` under `[Debug]` is for testing: it turns parts of the mod off by name. Leave it empty to play normally.
 
 ## Compatibility
 
 - Mods that also change the camera's zoom or position (such as first-person mods) may clash with this one.
+- If a game update breaks part of the mod, that part turns off on its own and the log says which one; the rest keeps working.
 - This mod has not been tested with a gamepad, only with keyboard and mouse.
 
 ## Uninstalling

@@ -1,3 +1,4 @@
+using BetterCamera.Core;
 using BetterCamera.FirstPerson;
 
 using HarmonyLib;
@@ -18,8 +19,12 @@ namespace BetterCamera.Patches;
 /// </list>
 /// </summary>
 [HarmonyPatch(typeof(Player), nameof(Player.SetMouseLook))]
+[Feature(Feature)]
 internal static class Player_SetMouseLook_Patch
 {
+    /// <summary>Without it, you can look down as far as vanilla allows, which in first person shows the inside of your body.</summary>
+    public const string Feature = "Look-down limit";
+
     /// <summary>
     /// Degrees to the side of the seat where the seated look-down limit starts to ease up, and where it reaches
     /// the sideways limit.

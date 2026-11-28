@@ -1,3 +1,4 @@
+using BetterCamera.Core;
 using BetterCamera.Photo;
 
 using HarmonyLib;
@@ -9,6 +10,7 @@ namespace BetterCamera.Patches;
 /// Vanilla ignores hits of 0.1 or less, so they don't count here either.
 /// </summary>
 [HarmonyPatch(typeof(Character), nameof(Character.ApplyDamage))]
+[Feature(PhotoMode.Feature)]
 internal static class Character_ApplyDamage_Patch
 {
     [HarmonyPostfix]

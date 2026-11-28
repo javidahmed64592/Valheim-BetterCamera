@@ -1,4 +1,5 @@
 using BetterCamera.Combat;
+using BetterCamera.Core;
 
 using HarmonyLib;
 
@@ -11,6 +12,7 @@ namespace BetterCamera.Patches;
 /// client, so this only needs the local player.
 /// </summary>
 [HarmonyPatch(typeof(Attack), nameof(Attack.GetMeleeAttackDir))]
+[Feature(MeleeAim.Feature)]
 internal static class Attack_GetMeleeAttackDir_Patch
 {
     [HarmonyPostfix]

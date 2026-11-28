@@ -1,3 +1,4 @@
+using BetterCamera.Core;
 using BetterCamera.Photo;
 
 using HarmonyLib;
@@ -8,6 +9,7 @@ namespace BetterCamera.Patches;
 /// Lets the inventory open and close in photo mode, which vanilla's free fly blocks.
 /// </summary>
 [HarmonyPatch(typeof(InventoryGui), "Update")]
+[Feature(PhotoMode.Feature)]
 internal static class InventoryGui_Update_Patch
 {
     [HarmonyPostfix]
