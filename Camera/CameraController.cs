@@ -45,9 +45,9 @@ internal static class CameraController
 
     private static readonly Dictionary<TravelMode, ZoomConfig> Zoom = [];
     private static ConfigEntry<bool> _firstPerson;
-    private static ConfigEntry<KeyboardShortcut> _cycleKey;
-    private static ConfigEntry<KeyCode> _shoulderKey;
-    private static ConfigEntry<KeyCode> _firstPersonKey;
+    private static KeyBinding _cycleKey;
+    private static KeyBinding _shoulderKey;
+    private static KeyBinding _firstPersonKey;
     private static ConfigEntry<float> _shipLift;
     private static ConfigEntry<float> _transitionTime;
     private static ConfigEntry<bool> _leftShoulderSaved;
@@ -111,16 +111,16 @@ internal static class CameraController
             "Zooming in past the minimum distance switches to first person, seeing your own arms and gear. " +
             "Zooming out again returns to third person.");
 
-        _cycleKey = config.Bind("Keybinds", "Switch Ship View", new KeyboardShortcut(KeyCode.C, KeyCode.LeftShift),
+        _cycleKey = KeyBinding.Bind(config, "Keybinds", "Switch Ship View", KeyCode.C, KeyModifier.Shift,
             "While steering a ship, switches the camera between following you and following the ship's centre.");
-        _shoulderKey = config.Bind("Keybinds", "Switch Shoulder", KeyCode.K,
+        _shoulderKey = KeyBinding.Bind(config, "Keybinds", "Switch Shoulder", KeyCode.K, KeyModifier.None,
             "In third person, moves the camera between your right shoulder (vanilla) and your left. " +
             "Rebindable from the in-game controls menu.");
-        InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = ShoulderButtonName, Config = _shoulderKey });
-        _firstPersonKey = config.Bind("Keybinds", "First Person", KeyCode.L,
+        InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = ShoulderButtonName, Config = _shoulderKey.KeyEntry });
+        _firstPersonKey = KeyBinding.Bind(config, "Keybinds", "First Person", KeyCode.L, KeyModifier.None,
             "Switches between first person and third person without zooming all the way in or out. Third person " +
             "comes back at the zoom you last had. Rebindable from the in-game controls menu.");
-        InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = FirstPersonButtonName, Config = _firstPersonKey });
+        InputManager.Instance.AddButton(BetterCameraPlugin.PluginGUID, new ButtonConfig { Name = FirstPersonButtonName, Config = _firstPersonKey.KeyEntry });
 
         const string views = "Views";
         _shipLift = config.Bind(views, "Ship Height", 4.5f,
@@ -304,7 +304,7 @@ internal static class CameraController
     {
         GameCamera camera = GameCamera.instance;
         if (camera == null || camera.m_freeFly || !_firstPerson.Value || Anchor != ViewAnchor.Player || !_modeKnown
-            || Blocked() || !ZInput.GetButtonDown(FirstPersonButtonQueryName))
+            || Blocked() || !(ZInput.GetButtonDown(FirstPersonButtonQueryName) && _firstPersonKey.Accepts()))
         {
             return;
         }
@@ -324,7 +324,7 @@ internal static class CameraController
     {
         GameCamera camera = GameCamera.instance;
         if (camera == null || camera.m_freeFly || camera.m_distance <= 0f || Blocked()
-            || !ZInput.GetButtonDown(ShoulderButtonQueryName))
+            || !(ZInput.GetButtonDown(ShoulderButtonQueryName) && _shoulderKey.Accepts()))
         {
             return;
         }
@@ -342,7 +342,7 @@ internal static class CameraController
     /// </summary>
     internal static bool CycleKeyDown(Player player)
     {
-        return SafePatcher.IsOn(ShipViewFeature) && Steering(player) && !Blocked() && KeyInput.IsDown(_cycleKey.Value);
+        return SafePatcher.IsOn(ShipViewFeature) && Steering(player) && !Blocked() && _cycleKey.IsDown();
     }
 
     private static string AnchorToken(ViewAnchor anchor)
